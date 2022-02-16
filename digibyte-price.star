@@ -22,16 +22,16 @@ iVBORw0KGgoAAAANSUhEUgAAAAYAAAAHCAYAAAArkDztAAAAAXNSR0IArs4c6QAAAEJJREFUGFddjsEN
 
 #this list contains the supported fiat currencies
 CURRENCY_LIST = {
-    "AUD (Australian Dollar)": "aud",
-    "CAD (Canadian Dollar)": "cad",
-    "EUR (Euro)": "eur",
-    "GBP (Great Britain Pound)": "gbp",
-    "USD (US Dollar)": "usd",
+    "AUD": "aud",
+    "CAD": "cad",
+    "EUR": "eur",
+    "GBP": "gbp",
+    "USD": "usd",
 }
 
 # Set applet defaults
-DEFAULT_FIRST_CURRENCY = "USD (US Dollar)"
-DEFAULT_SECOND_CURRENCY = "EUR (Euro)"
+DEFAULT_FIRST_CURRENCY = "USD"
+DEFAULT_SECOND_CURRENCY = "EUR"
 DEFAULT_SHOW_FIRST_CURRENCY = True
 DEFAULT_SHOW_SECOND_CURRENCY = False
 DEFAULT_SHOW_SATS = True
@@ -98,16 +98,12 @@ def main(config):
 
     DIGIBYTE_PRICE_URL = "https://api.coingecko.com/api/v3/simple/price?ids=digibyte&vs_currencies=aud%2Ccad%2Ceur%2Cgbp%2Csats%2Cusd"
 
-    first_currency = CURRENCY_LIST.get(config.get("first_currency"))
-    second_currency = CURRENCY_LIST.get(config.get("second_currency"))
+    first_currency = CURRENCY_LIST.get(config.get("first_currency"), CURRENCY_LIST["USD"])
+    second_currency = CURRENCY_LIST.get(config.get("second_currency"), CURRENCY_LIST["GBP"])
     first_currency_toggle = config.bool("first_currency_toggle")
     second_currency_toggle = config.bool("second_currency_toggle")
     sats_toggle = config.bool("sats_toggle")
     country_toggle = config.bool("country_toggle")
-
-# debugging - manually set variable
-#   first_currency = "usd"
-#   second_currency = "eur"
 
 
     # LOOKUP CURRENT PRICES (OR RETRIEVE FROM CACHE)
