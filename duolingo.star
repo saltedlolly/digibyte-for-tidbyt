@@ -1,9 +1,14 @@
 """
 Applet: Duolingo 
-Summary: Track language progress
+Summary: Track language study progress
 Description: Display Duolingo stats and track your progress towards a daily XP target.
 Author: Olly Stedall @saltedlolly
+Thanks: @drudge
 """
+
+################################################################################
+# IMPORTANT: This app is still a work in progress and is not yet fully working
+################################################################################
 
 print(" ---------------------------------------------------------------------------------------------------------------------")
 
@@ -49,10 +54,22 @@ iVBORw0KGgoAAAANSUhEUgAAAAkAAAAGCAYAAAARx7TFAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAYElE
 
 
 # Set applet defaults
-DEFAULT_USERNAME = "saltedlolly"
+DEFAULT_USERNAME = "saltedlolly92374923847"
 DEFAULT_DAILY_XP_TARGET = "100"
 DEFAULT_SHOW_USERNAME = True
 DEFAULT_TIMEZONE = "Europe/London"
+
+# Display options
+displayoptions = [
+    schema.Option(
+        display = "Day View",
+        value = "day",
+    ),
+#    schema.Option(
+#        display = "Week View",
+#        value = "week",
+#    ),
+]
 
 def get_schema():
 
@@ -66,9 +83,17 @@ def get_schema():
             icon = "cog",
             default = DEFAULT_USERNAME,
         ),
+        schema.Dropdown(
+            id = "display",
+            name = "Display",
+            desc = "Choose Day or Week view.",
+            icon = "brush",
+            default = displayoptions[0].value,
+            options = displayoptions,
+        ),
         schema.Text(
             id = "xp_target",
-            name = "Daily XP",
+            name = "Daily XP target",
             desc = "Enter a daily XP goal. Note: This goal resets when the app first runs after midnight. If your ",
             icon = "cog",
             default = DEFAULT_DAILY_XP_TARGET,
@@ -111,22 +136,17 @@ def main(config):
     if duo_username != None:
         duolingo_query_url =  duolingo_query_url_prefix + duo_username
 
-    # Setup xp summary query URL
-    duo_xpsummary_query_1 = "https://www.duolingo.com/2017-06-30/users/"
-    duo_xpsummary_query_2 = "/xp_summaries?startDate="
-    duo_xpsummary_query_3 = "&endDate="
-    duo_xpsummary_query_4 = "&timezone="
+
+    # !!!!!!!!!! USED DURING TESTING - WILL RESET THE CACHED USERID TO FORCE TO A NEW QUERY
+ #   duo_userid_cached = None
 
 
-    # Reset during testing
-    duo_userid_cached = None
-
-    # Example Query: https://www.duolingo.com/2017-06-30/users/xp_summaries?startDate=2022-02-24&endDate=2022-02-24&Europe/London
 
 
     # LOOKUP CURRENT DUOLINGO USERID (OR RETRIEVE FROM CACHE)
-    # If the userid for the provided username is not yet known, a query is sent to duolingo.com to retrieve it
+    # If the userid for the provided username is not yet known, send a query to duolingo.com to retrieve it
     # Thereafter the userid for the associated username is cached for 7 days, and the timer is updated on each run
+    # i.e. So as long as that username continues to be used in the app, the userid will remain cached
 
 
     # Check a username has been provided (i.e. field is not blank)
@@ -136,7 +156,6 @@ def main(config):
             do_duolingo_query = True
         else:
             do_duolingo_query = False
-            print("Getting userId from cache.")
             duo_userid = duo_userid_cached
             print("Cached userId for username " + duo_username + ": " + duo_userid)
             # update userid cache timer
@@ -156,27 +175,43 @@ def main(config):
             display_error_msg = True
             error_message = "Error: Duolingo query failed. Check internet connectivity."
         else:
-            if (duolingo_query.json()["users"][0]["id"]) != None:
-                duo_userid = int(duolingo_query.json()["users"][0]["id"])
-            print("Userd ID: " + str(duo_userid))
-            # Show error if username was not recognised
-            if duo_userid == "":
-                print("userId query failed with status %d", duolingo_query.status_code)
+            # display an error message if the username is unrecognised
+            if len(duolingo_query.json()["users"]) == 0:
+                print("Error! Unrecognised username.")
                 display_error_msg = True
-                error_message_1 = "Username is unrecognised."
+                error_message_1 = "Unrecognised username."
+                duo_userid = None
             else:
-                display_error_msg = False
-                print("Queried userId for username \"" + str(duo_username) + "\": " + str(duo_userid))
-                cache.set(duo_cache_key_userid, str(duo_userid), ttl_seconds=604800)
+                duo_userid = int(duolingo_query.json()["users"][0]["id"])
+                if duo_userid != None:
+                    print("Success! userId for username \"" + str(duo_username) + "\": " + str(duo_userid))
+                    cache.set(duo_cache_key_userid, str(duo_userid), ttl_seconds=604800)
+                    display_error_msg = False
+                else:
+                    # Show error if username not found
+                    print("userId not found.")
+                    display_error_msg = True
+                    error_message_1 = "Username not found."
+
+    
 
 
-
-    # If we know the userId then get the progress data for that user (either from duolingo or from cache)
-
+    # If we know the userId then next we'll lookup the progress data for that user (either from duolingo or from cache)
     if duo_userid != None:
 
-        # LOOKUP XP SUMMARY
+
+
+        # LOOKUP DUOLINGO XP SUMMARY
         # The XP summary is updated every 15 minutes
+
+        # Example Query: https://www.duolingo.com/2017-06-30/users/xp_summaries?startDate=2022-02-24&endDate=2022-02-24&Europe/London
+
+        # Setup xp summary query URL
+        duo_xpsummary_query_1 = "https://www.duolingo.com/2017-06-30/users/"
+        duo_xpsummary_query_2 = "/xp_summaries?startDate="
+        duo_xpsummary_query_3 = "&endDate="
+        duo_xpsummary_query_4 = "&timezone="
+
 
         # Get today's date
         now = time.now().in_location(timezone)
@@ -195,21 +230,23 @@ def main(config):
         DUO_XP_QUERY_URL = duo_xpsummary_query_1 + str(duo_userid) + duo_xpsummary_query_2 + startDate + duo_xpsummary_query_3 + endDate + duo_xpsummary_query_4 + timezone
 
         if duo_xpsummary_cached != None:
-            print("Hit! Displaying cached XP summary data.")
             duo_xpsummary = duo_xpsummary_cached
+            print("XP summary data retrieved from cache.")
         else:
-            print("Miss! Querying duolingo for XP summary data.")
+            print("Querying duolingo.com for XP summary data.")
             xpsummary_query = http.get(DUO_XP_QUERY_URL)
             if xpsummary_query.status_code != 200:
                 print("XP summary query failed with status %d", xpsummary_query.status_code)
                 display_error_msg = True
-                error_message = "Error: XP Summary query failed. Check internet connectivity."
+                error_message_1 = "XP Summary query failed."
+                error_message_2 = "Check internet connection."
             else:
                 display_error_msg = False
-                duo_xpsummary = xpsummary_query.json()
+                duo_xpsummary = str(xpsummary_query)
                 # Show error if username was not recognised
-                print("XP Summary returned.")
-                cache.set(duo_cache_key_xpsummary, str(duo_xpsummary), ttl_seconds=14400)
+            print("XP summary data retrieved from duolingo.com")
+            cache.set(duo_cache_key_xpsummary, duo_xpsummary, ttl_seconds=14400)
+
 
 
         # LOOKUP DUOLINGO ACCOUNT DATA AT START OF DAY
@@ -245,10 +282,11 @@ def main(config):
             # Next find out the XP achieved already today (in case some XP was already gained today before this ran i.e. after midnight)
 
             # First we get today's XP count from the xpsummary_query
-            duo_xptoday = int(duo_xpsummary.json()["summaries"][1]["gainedXp"])
+            duo_xptoday = int(duo_xpsummary.json()["summaries"][0]["gainedXp"])
             print("XP Today: " + duo_xptoday)
 
-            # Finally update the cache with the new date so this won't run again until tomorrow
+            # Finally update the cache with the new date so this won't run again until tomorrow (stored for 36 hours)
+ #          cache.set(duo_cache_key_saveddate, str(saved_date), ttl_seconds=129600)
 
 
 
@@ -256,7 +294,6 @@ def main(config):
     # If the data queries failed in any way, then show an error on the Tidbyt
 
     if display_error_msg == True:
-        print("ERROR! No duolingo data available!")
         display_output = render.Box(
             render.Row(
                 expanded = True,
