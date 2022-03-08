@@ -38,13 +38,18 @@ iVBORw0KGgoAAAANSUhEUgAAABAAAAASCAYAAABSO15qAAAACXBIWXMAAAsTAAALEwEAmpwYAAABoUlE
 """)
 
 DUOLINGO_ICON_CRY = base64.decode("""
-R0lGODlhEAASANUsAI3/AYz/AI3+AQ645uDg4OHg4Iz+AYz+AODg4f+YAYz/Af///wEBAf6YAP+ZAP/BB+Dh4P6ZAf+ZAQEAAf7AB43/ABewyyavqEbXgB+wuSfGuESuYy6vlz6vdD6uczWvhiawqBWwzx6vuUyuUY3+AEyvUE2vUE2uUU2uUE2vUUyuUEyvUf///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/wtYTVAgRGF0YVhNUDw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDcuMS1jMDAwIDc5LmVkYTJiM2ZhYywgMjAyMS8xMS8xNy0xNzoyMzoxOSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDplYjRkMWNlMC1mNzMxLTQ5ZDAtOGQ5MC1iODRmMjMyNGJmNmIiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NDc3QjlFN0U4QUFBMTFFQzkwOTk4MEJEQTNFNEYzNzciIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NDc3QjlFN0Q4QUFBMTFFQzkwOTk4MEJEQTNFNEYzNzciIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDIzLjEgKE1hY2ludG9zaCkiPiA8eG1wTU06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
 """)
 
 
-# Streak Icon Flame 7x8
-STREAK_ICON = base64.decode("""
+# Streak Icon Flame Gold 7x8
+STREAK_ICON_GOLD = base64.decode("""
 iVBORw0KGgoAAAANSUhEUgAAAAcAAAAICAYAAAA1BOUGAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAa0lEQVQImUWOwRGCAAwE9xgdWrE5qvGD3WgPPKAUdIb1EYn55TbZBJWzjufYjcrQ4DXKtgOQX9YQAYMP2nUBOOZIhNu15ua3QIb2rB9CMGnv8L8hAll3Tm1tLoIhW4EsBaOSBKd6JEDulX8BRtYybu/wWx4AAAAASUVORK5CYII=
+""")
+
+# Streak Icon Flame Grey 7x8
+STREAK_ICON_GREY = base64.decode("""
+iVBORw0KGgoAAAANSUhEUgAAAAcAAAAICAYAAAA1BOUGAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAZUlEQVQImU2O0Q1FIQhDT80bwi0dQ3+dQLdTp+j7gtwmJJxAC9gmtNZKsE0J2Hv73stX5bsJMMZI9w+g925J1FoJBlQAJHHvRVJWOiPWNu+9PFEAzjkAOYjHZBtJtNYc/ZxTtvkD+ZdAH/vb6vgAAAAASUVORK5CYII=
 """)
 
 # Crown Icon  9x7
@@ -54,24 +59,23 @@ iVBORw0KGgoAAAANSUhEUgAAAAkAAAAGCAYAAAARx7TFAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAYElE
 
 
 # Set applet defaults
-DEFAULT_USERNAME = "saltedlolly"
+DEFAULT_USERNAME = "saltedlollydsjhfg"
 DEFAULT_DAILY_XP_TARGET = "100"
 DEFAULT_SHOW_USERNAME = True
 DEFAULT_TIMEZONE = "Europe/London"
+DEFAULT_DISPLAY_VIEW = "Day View"
 
-# Display options
-displayoptions = [
-    schema.Option(
-        display = "Day View",
-        value = "day",
-    ),
-#    schema.Option(
-#        display = "Week View",
-#        value = "week",
-#    ),
-]
+DISPLAY_VIEW_LIST = {
+    "Day View": "day",
+    "Week View": "week",
+}
 
 def get_schema():
+
+    displayoptions = [
+        schema.Option(display = displayv, value = displayv)
+        for displayv in DISPLAY_VIEW_LIST
+    ]
 
     return schema.Schema(
     version = "1",
@@ -80,14 +84,14 @@ def get_schema():
             id = "duolingo_username",
             name = "Username",
             desc = "Enter a Duolingo username.",
-            icon = "cog",
+            icon = "user",
             default = DEFAULT_USERNAME,
         ),
         schema.Dropdown(
-            id = "display",
+            id = "display_view",
             name = "Display",
             desc = "Choose Day or Week view.",
-            icon = "brush",
+            icon = "rectangle-wide",
             default = displayoptions[0].value,
             options = displayoptions,
         ),
@@ -95,7 +99,7 @@ def get_schema():
             id = "xp_target",
             name = "Daily XP target",
             desc = "Enter a daily XP goal. Note: This goal resets when the app first runs after midnight. If your ",
-            icon = "cog",
+            icon = "trophy",
             default = DEFAULT_DAILY_XP_TARGET,
         ),
         schema.Toggle(
@@ -114,7 +118,7 @@ def main(config):
     duolingo_username = config.get("duolingo_username", DEFAULT_USERNAME)
     xp_target = config.get("xp_target", DEFAULT_DAILY_XP_TARGET)
     display_username_toggle = config.bool("display_username_toggle", DEFAULT_SHOW_USERNAME)
-#    display_output = displayoptions.get(config.get("display"), displayoptions[0].value)
+    display_view = DISPLAY_VIEW_LIST.get(config.get("display_view"), DEFAULT_DISPLAY_VIEW)
 
     # Setup user cache keys
     duolingo_cache_key_username = "duolingo_%s" % duolingo_username
@@ -123,6 +127,7 @@ def main(config):
     duolingo_cache_key_main_json = "%s_main_json" % duolingo_cache_key_username
     duolingo_cache_key_saveddate = "%s_saveddate" % duolingo_cache_key_username
     duolingo_cache_key_totalxp_daystart = "%s_totalxp_daystart" % duolingo_cache_key_username
+    duolingo_cache_key_streak_daystart = "%s_streak_daystart" % duolingo_cache_key_username
 
     # Get Cache variables
     duolingo_userid_cached = cache.get(duolingo_cache_key_userid)
@@ -130,6 +135,7 @@ def main(config):
     duolingo_main_json_cached = cache.get(duolingo_cache_key_main_json)
     duolingo_saveddate_cached = cache.get(duolingo_cache_key_saveddate)
     duolingo_totalxp_daystart_cached = cache.get(duolingo_cache_key_totalxp_daystart)
+    duolingo_streak_daystart_cached = cache.get(duolingo_cache_key_streak_daystart)
 
     # Get time and location variables
     timezone = config.get("timezone", DEFAULT_TIMEZONE)
@@ -168,28 +174,37 @@ def main(config):
             # update userid cache timer
             cache.set(duolingo_cache_key_userid, duolingo_userid, ttl_seconds=604800)
             display_error_msg = False
-    else:
-        print("Error! No Duolingo username provided.")
-        display_error_msg = True
-        error_message_1 = "Username is"
-        error_message_2 = "blank."
+#    else:
+#        print("Error! No Duolingo username provided.")
+#        display_error_msg = True
+#        error_message_1 = "username"
+#        error_message_2 = "is blank"
 
     # Lookup userId from supplied username (if not already found in cache)
     if do_duolingo_main_query == True:
         print("Querying duolingo.com for userId...")
         duolingo_main_query = http.get(duolingo_main_query_url)
         if duolingo_main_query.status_code != 200:
-            print("Duolingo query failed with status %d", duolingo_main_query.status_code)
-            display_error_msg = True
-            error_message = "Error: Duolingo query failed. Check internet connectivity."
+            if duolingo_main_query.status_code == 422:
+                print("Error! No Duolingo username provided.")
+                display_error_msg = True
+                error_message_1 = "username"
+                error_message_2 = "is blank"
+                duolingo_userid = None
+            else:
+                print("Duolingo query failed with status %d", duolingo_main_query.status_code)
+                display_error_msg = True
+                error_message_1 = "check"
+                error_message_1 = "connection"
+                duolingo_userid = None
         else:
             # display an error message if the username is unrecognised
             duolingo_main_json = duolingo_main_query.json()
             if duolingo_main_json["users"] == []:
                 print("Error! Unrecognised username.")
                 display_error_msg = True
-                error_message_1 = "ERROR: username"
-                error_message_2 = "is unrecognised."
+                error_message_1 = "invalid"
+                error_message_2 = "username"
                 duolingo_userid = None
             else:
                 duolingo_userid = int(duolingo_main_json["users"][0]["id"])
@@ -201,7 +216,8 @@ def main(config):
                     # Show error if username not found
                     print("userId not found.")
                     display_error_msg = True
-                    error_message_1 = "Username not found."
+                    error_message_1 = "username"
+                    error_message_2 = "not found"
 
     
 
@@ -247,8 +263,8 @@ def main(config):
             if xpsummary_query.status_code != 200:
                 print("XP summary query failed with status %d", xpsummary_query.status_code)
                 display_error_msg = True
-                error_message_1 = "XP Summary query failed."
-                error_message_2 = "Check internet connection."
+                error_message_1 = "check"
+                error_message_2 = "connection"
                 live_xp_data = None
             else:
                 display_error_msg = False
@@ -260,12 +276,23 @@ def main(config):
 
         # Now we get today's daily XP count from the xpsummary_query_json variable (which updates with live data every 15 mins)
         # We'll need this below, to calculate the total XP earned
-        duolingo_xptoday = int(duolingo_xpsummary_json["summaries"][0]["gainedXp"])
+        duolingo_xptoday = duolingo_xpsummary_json["summaries"][0]["gainedXp"]
+
+        # If the current XP score is null convert to integer zero
+        if str(duolingo_xptoday) == "null":
+            duolingo_xptoday = 0
+        else:
+            duolingo_xptoday = int(duolingo_xptoday)
+
+
+        # Get current streak status
+        is_streak_extended = bool(duolingo_xpsummary_json["summaries"][0]["streakExtended"])
 
 
         # LOOKUP DUOLINGO MAIN JSON DATA AT START OF DAY
         # The is run daily to calculate what the user's totalXP was at the start of the day
-        # It runs whenever it detects that the date has changed sicne the previous run
+        # It runs whenever it detects that the date has changed from the previous time it was run
+        # It also requires live XP data to be available (rather than cached data)
 
         # Run this if today's date has changed and live data has just been retried (or this is the first time running)
         if (duolingo_saveddate_cached != date_now) and (live_xp_data == True):
@@ -275,6 +302,7 @@ def main(config):
             # (we will use this to calculate the running XP total throughout the day)
             if do_duolingo_main_query == True:
                 duolingo_totalxp = int(duolingo_main_json["users"][0]["totalXp"])
+                duolingo_streak = int(duolingo_main_json["users"][0]["streak"])
             else:
                 # Setup userid query URL
                 print("Querying duolingo.com for current totalXp...")
@@ -291,10 +319,25 @@ def main(config):
                     if duolingo_totalxp == "":
                         print("totalXp query failed with status %d", duolingo_main_query.status_code)
                         display_error_msg = True
-                        error_message = "Error: totalXp not found."
+                        error_message_1 = "totalXp"
+                        error_message_2 = "not found"
                     else:
                         display_error_msg = False
                         print("Queried totalXp for username \"" + str(duolingo_username) + "\": " + str(duolingo_totalxp))
+ #                       cache.set(duolingo_cache_key_totalxp, str(duolingo_totalxp), ttl_seconds=86400)
+
+                    # Get current streak
+                    duolingo_streak = int(duolingo_main_json["users"][0]["streak"])
+                    
+                    # Show error if totalxp was not found
+                    if duolingo_streak == "":
+                        print("Streak query failed with status %d", duolingo_main_query.status_code)
+                        display_error_msg = True
+                        error_message_1 = "streak"
+                        error_message_2 = "not found"
+                    else:
+                        display_error_msg = False
+                        print("Queried Streak for username \"" + str(duolingo_username) + "\": " + str(duolingo_totalxp))
  #                       cache.set(duolingo_cache_key_totalxp, str(duolingo_totalxp), ttl_seconds=86400)
 
 
@@ -309,6 +352,17 @@ def main(config):
             cache.set(duolingo_cache_key_totalxp_daystart, str(duolingo_totalxp_daystart), ttl_seconds=86400)
 
 
+            # Now we cache the Streak at the start of the day, and store it in the cache
+            if is_streak_extended == True:
+                duolingo_streak_daystart = int(duolingo_streak) - 1
+            else:
+                duolingo_streak_daystart = int(duolingo_streak)
+
+            print("Streak at Start of Day: " + str(duolingo_streak_daystart))
+
+            # Store start-of-day XP count in cache (for 24hrs)
+            cache.set(duolingo_cache_key_streak_daystart, str(duolingo_streak_daystart), ttl_seconds=86400)
+
             # Finally update the cache with the new date so this won't run again until tomorrow (stored for 24 hours)
             cache.set(duolingo_cache_key_saveddate, str(date_now), ttl_seconds=86400)
 
@@ -322,7 +376,7 @@ def main(config):
         elif live_xp_data == None:
             print("---- CURRENT DATA: UNAVAILABLE ----- ")
 
-        # Use cached value for current Total XP if live value is not available
+        # Use cached value for Total XP at day start if live value is not available
         if duolingo_totalxp_daystart_cached != None:
             duolingo_totalxp_daystart = str(duolingo_totalxp_daystart_cached)
 
@@ -330,11 +384,29 @@ def main(config):
         duolingo_totalxp_now = int(duolingo_totalxp_daystart) + int(duolingo_xptoday)
         print("Today's XP: " + str(duolingo_xptoday) + "  Start of Day: " + str(duolingo_totalxp_daystart) + "   TOTAL XP: " + str(duolingo_totalxp_now))
 
+        # Use cached value for Streak at day start if live value is not available
+        if duolingo_streak_daystart_cached != None:
+            duolingo_streak_daystart = str(duolingo_streak_daystart_cached)
+
+        # Calculate current Streak, based on whther it has already been extended today
+        if is_streak_extended == True:
+            duolingo_streak_now = int(duolingo_streak_daystart) + 1
+        else:
+            duolingo_streak_now = int(duolingo_streak_daystart)
+
+        print("Streak: " + str(duolingo_streak_now) + "   Streak Extended?: " + str(is_streak_extended))
+
+
         is_frozen = bool(duolingo_xpsummary_json["summaries"][0]["frozen"])
         print("Frozen?: " + str(is_frozen))
 
-        is_streak_extended = bool(duolingo_xpsummary_json["summaries"][0]["streakExtended"])
-        print("Streak Extended?: " + str(is_streak_extended))
+
+        # Deduce what streak icon to display on day view
+
+        if is_streak_extended == False:
+            streak_icon = STREAK_ICON_GREY
+        elif is_streak_extended == True:
+            streak_icon = STREAK_ICON_GOLD
 
 
 
@@ -342,6 +414,8 @@ def main(config):
     # If the data queries failed in any way, then show an error on the Tidbyt
 
     if display_error_msg == True:
+        print("Displaying Error message on Tidbyt...")
+
         display_output = render.Box(
             render.Row(
                 expanded = True,
@@ -354,25 +428,75 @@ def main(config):
                     render.Column(
                         main_align = "space_evenly",
                         expanded = True,
-                        children = render.Column(
-                            cross_align = "center",
-                            children = [
-                                render.Text("ERROR:", font = "CG-pixel-3x5-mono", color = "#FF0000"),
-                                render.Text("%s" % error_message_1, font = "CG-pixel-3x5-mono"),
-                                render.Text("%s" % error_message_2, font = "CG-pixel-3x5-mono"),
-                            ],
-                        ),
+                        children = [
+                            render.Text("ERROR:", font = "CG-pixel-3x5-mono", color = "#FF0000"),
+                            render.Text("%s" % error_message_1, font = "tom-thumb"),
+                            render.Text("%s" % error_message_2, font = "tom-thumb"),
+                        ],
                     ),
                 ],
             ),
         )
 
+    # DISPLAY DAY VIEW
+    # Setup day view layout
 
+    if display_error_msg == False and display_view == "day":
+        print("Displaying Day View on Tidbyt...")   
 
+        display_output = render.Box(
+            render.Row(
+                expanded = True,
+                main_align = "space_evenly",
+                cross_align = "center",
+                children = [
+                    render.Column(
+                        main_align = "space_evenly",
+                        expanded = True,
+                        children = [
+                            render.Row(
+                                main_align = "space_evenly",
+                                expanded = False,
+                                children = [
+                                    render.Image(src = streak_icon),
+                                    render.Text(str("olly"), font = "tom-thumb"),
+                                ],
+                            ),
+                            render.Row(
+                                main_align = "space_evenly",
+                                expanded = False,
+                                children = [
+                                    render.Image(src = streak_icon),
+                                    render.Text(str(duolingo_streak_now), font = "tom-thumb"),
+                                ],
+                            ),
+                            render.Row(
+                                main_align = "space_evenly",
+                                expanded = False,
+                                children = [
+                                    render.Image(src = streak_icon),
+                                    render.Text(str(duolingo_totalxp_now), font = "tom-thumb"),
+                                ],
+                            ),
+                        ],
+                    ),
+
+                    # Column to hold pricing text evenly distrubuted accross 1-3 rows
+                    render.Column(
+                        main_align = "space_evenly",
+                        expanded = True,
+                        children = [
+                            render.Text(str(duolingo_xptoday) + " xp", font = "tom-thumb"),
+                            render.Image(src = DUOLINGO_ICON),
+                        ],
+                    ),
+                ],
+            ),
+        )
 
     return render.Root(
-          child = []
-#        child = display_output,
+        child = display_output,
     )
+
 
 
