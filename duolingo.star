@@ -44,12 +44,17 @@ UklGRnYLAABXRUJQVlA4WAoAAAASAAAADwAAEQAAQU5JTQYAAAD/////AABBTk1GBAEAAAAAAAAAAA8A
 
 # Streak Icon Flame Gold 7x8
 STREAK_ICON_GOLD = base64.decode("""
-iVBORw0KGgoAAAANSUhEUgAAAAcAAAAICAYAAAA1BOUGAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAa0lEQVQImUWOwRGCAAwE9xgdWrE5qvGD3WgPPKAUdIb1EYn55TbZBJWzjufYjcrQ4DXKtgOQX9YQAYMP2nUBOOZIhNu15ua3QIb2rB9CMGnv8L8hAll3Tm1tLoIhW4EsBaOSBKd6JEDulX8BRtYybu/wWx4AAAAASUVORK5CYII=
+iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAE4GlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNy4xLWMwMDAgNzkuZWRhMmIzZmFjLCAyMDIxLzExLzE3LTE3OjIzOjE5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgMjMuMSAoTWFjaW50b3NoKSIgeG1wOkNyZWF0ZURhdGU9IjIwMjItMDItMjBUMTc6NDU6MjRaIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyMi0wMy0wOVQxODoxMToxNVoiIHhtcDpNZXRhZGF0YURhdGU9IjIwMjItMDMtMDlUMTg6MTE6MTVaIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDowZGZjMTU2Yy1mMTlkLTQ5NjItOGFjZS04ZTExYzc3MTRlMmEiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MGRmYzE1NmMtZjE5ZC00OTYyLThhY2UtOGUxMWM3NzE0ZTJhIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6MGRmYzE1NmMtZjE5ZC00OTYyLThhY2UtOGUxMWM3NzE0ZTJhIj4gPHhtcE1NOkhpc3Rvcnk+IDxyZGY6U2VxPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY3JlYXRlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDowZGZjMTU2Yy1mMTlkLTQ5NjItOGFjZS04ZTExYzc3MTRlMmEiIHN0RXZ0OndoZW49IjIwMjItMDItMjBUMTc6NDU6MjRaIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjMuMSAoTWFjaW50b3NoKSIvPiA8L3JkZjpTZXE+IDwveG1wTU06SGlzdG9yeT4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7IM7HhAAAAY0lEQVQImVXMwQ2DQAwF0flIESklzaUaTmw32wMHUgqKxOTgBSm+2c8aVABUzhUBMvaJMfanGNT6gEIVIrwe0GevWmGbZP8Sggm0eGMqjED24z/LJhjyKchWGJUk+EZHJUvdf996OJzBUg9UAAAAAElFTkSuQmCC
 """)
 
 # Streak Icon Flame Grey 7x8
 STREAK_ICON_GREY = base64.decode("""
-iVBORw0KGgoAAAANSUhEUgAAAAcAAAAICAYAAAA1BOUGAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAZUlEQVQImU2O0Q1FIQhDT80bwi0dQ3+dQLdTp+j7gtwmJJxAC9gmtNZKsE0J2Hv73stX5bsJMMZI9w+g925J1FoJBlQAJHHvRVJWOiPWNu+9PFEAzjkAOYjHZBtJtNYc/ZxTtvkD+ZdAH/vb6vgAAAAASUVORK5CYII=
+iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAWklEQVQImVXOwQ3AIAxD0W/2YB42IYvAUIxDFnEPLVXr27OlKNgGwDa99xuPy8Gc06c8Kd+i1soYw8cFICKcmUhCEhHhd/wmM/9n996/4Vi2kURr7f1krSXbXLJqNT5ffLfKAAAAAElFTkSuQmCC
+""")
+
+# XP Icon  7x7
+XP_ICON = base64.decode("""
+iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAUklEQVQImWWOQRKAIAwDk/5K3yov1CcU1gMgztBbukkbA1oTQzRLUuxAtq0fXAl7XQop4Dm+dGYBhgOsdp8CBAZMZhGw/6z18ty4t+3AxjBZ0wuaEDIIXi0mQgAAAABJRU5ErkJggg==
 """)
 
 # Crown Icon  9x7
@@ -59,15 +64,16 @@ iVBORw0KGgoAAAANSUhEUgAAAAkAAAAGCAYAAAARx7TFAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAYElE
 
 
 # Set applet defaults
-DEFAULT_USERNAME = "saltedlollydsjhfg"
+DEFAULT_USERNAME = "saltedlolly"
 DEFAULT_DAILY_XP_TARGET = "100"
-DEFAULT_SHOW_USERNAME = True
 DEFAULT_TIMEZONE = "Europe/London"
-DEFAULT_DISPLAY_VIEW = "Day View"
+DEFAULT_DISPLAY_VIEW = "Today"
+DEFAULT_NICKNAME = "Olly"
+DEFAULT_SHOW_NICKNAME = False
 
 DISPLAY_VIEW_LIST = {
-    "Day View": "day",
-    "Week View": "week",
+    "Today": "today",
+    "Week": "week",
 }
 
 def get_schema():
@@ -90,7 +96,7 @@ def get_schema():
         schema.Dropdown(
             id = "display_view",
             name = "Display",
-            desc = "Choose Day or Week view.",
+            desc = "Choose Today or Week view.",
             icon = "rectangle-wide",
             default = displayoptions[0].value,
             options = displayoptions,
@@ -98,16 +104,23 @@ def get_schema():
         schema.Text(
             id = "xp_target",
             name = "Daily XP target",
-            desc = "Enter a daily XP goal. Note: This goal resets when the app first runs after midnight. If your ",
+            desc = "Enter a daily XP goal. Resets at midnight.",
             icon = "trophy",
             default = DEFAULT_DAILY_XP_TARGET,
         ),
+        schema.Text(
+            id = "nickname",
+            name = "Nickname",
+            desc = "Display on Tidbyt to identify the user. Max 5 letters.",
+            icon = "user",
+            default = DEFAULT_NICKNAME,
+        ),
         schema.Toggle(
-            id = "display_username_toggle",
-            name = "Display Username?",
-            desc = "Toggle displaying Duolingo username.",
+            id = "display_nickname_toggle",
+            name = "Display Nickname?",
+            desc = "Toggle displaying user nickname.",
             icon = "toggle-on",
-            default = DEFAULT_SHOW_USERNAME,
+            default = DEFAULT_SHOW_NICKNAME,
         ),
     ],
 )
@@ -116,9 +129,10 @@ def main(config):
 
     # Get Schema variables
     duolingo_username = config.get("duolingo_username", DEFAULT_USERNAME)
-    xp_target = config.get("xp_target", DEFAULT_DAILY_XP_TARGET)
-    display_username_toggle = config.bool("display_username_toggle", DEFAULT_SHOW_USERNAME)
     display_view = DISPLAY_VIEW_LIST.get(config.get("display_view"), DEFAULT_DISPLAY_VIEW)
+    xp_target = config.get("xp_target", DEFAULT_DAILY_XP_TARGET)
+    nickname = config.get("nickname", DEFAULT_NICKNAME)
+    display_nickname_toggle = config.bool("display_nickname_toggle", DEFAULT_SHOW_NICKNAME)
 
     # Setup user cache keys
     duolingo_cache_key_username = "duolingo_%s" % duolingo_username
@@ -274,6 +288,17 @@ def main(config):
                 print("XP summary data retrieved from duolingo.com")
                 cache.set(duolingo_cache_key_xpsummary_json, json.encode(duolingo_xpsummary_json), ttl_seconds=900)
 
+        # Work out whther today's data is being returned or not (by checking the number of days in string)
+        days_returned = len(duolingo_xpsummary_json["summaries"])
+        print("Days returned: " + str(days_returned))
+
+        # Setup dummy data for today
+        today_dummy_data = { "gainedXp": 0, "streakExtended": False }
+
+        # Insert today's dummy data into JSON variable
+        if days_returned == 6:
+            duolingo_xpsummary_json["summaries"].insert(0, today_dummy_data)
+
         # Now we get today's daily XP count from the xpsummary_query_json variable (which updates with live data every 15 mins)
         # We'll need this below, to calculate the total XP earned
         duolingo_xptoday = duolingo_xpsummary_json["summaries"][0]["gainedXp"]
@@ -338,7 +363,7 @@ def main(config):
                     else:
                         display_error_msg = False
                         print("Queried Streak for username \"" + str(duolingo_username) + "\": " + str(duolingo_totalxp))
- #                       cache.set(duolingo_cache_key_totalxp, str(duolingo_totalxp), ttl_seconds=86400)
+ #                      cache.set(duolingo_cache_key_totalxp, str(duolingo_totalxp), ttl_seconds=86400)
 
 
             # Now we subtract the daily XP count from the total count to find out the XP count at the start of the day
@@ -382,7 +407,7 @@ def main(config):
 
         # Calculate current total XP
         duolingo_totalxp_now = int(duolingo_totalxp_daystart) + int(duolingo_xptoday)
-        print("Today's XP: " + str(duolingo_xptoday) + "  Start of Day: " + str(duolingo_totalxp_daystart) + "   TOTAL XP: " + str(duolingo_totalxp_now))
+        print("Today's XP: " + str(duolingo_xptoday) + "  Total XP (at day start): " + str(duolingo_totalxp_daystart) + "   TOTAL XP: " + str(duolingo_totalxp_now))
 
         # Use cached value for Streak at day start if live value is not available
         if duolingo_streak_daystart_cached != None:
@@ -396,9 +421,6 @@ def main(config):
 
         print("Streak: " + str(duolingo_streak_now) + "   Streak Extended?: " + str(is_streak_extended))
 
-
-        is_frozen = bool(duolingo_xpsummary_json["summaries"][0]["frozen"])
-        print("Frozen?: " + str(is_frozen))
 
 
         # Deduce what streak icon to display on day view
@@ -441,8 +463,21 @@ def main(config):
     # DISPLAY DAY VIEW
     # Setup day view layout
 
-    if display_error_msg == False and display_view == "day":
-        print("Displaying Day View on Tidbyt...")   
+    if display_error_msg == False and display_view == "Today":
+        print("Displaying Day View on Tidbyt...")  
+
+
+        # Setup nickname display, if needed
+        if display_nickname_toggle == True:
+            nickname_today_view = render.Row(
+                main_align = "space_evenly",
+                expanded = False,
+                children = [
+                    render.Text(str(nickname), font = "tom-thumb"),
+                ],
+            )
+        else:
+            nickname_today_view = None
 
         display_output = render.Box(
             render.Row(
@@ -454,14 +489,7 @@ def main(config):
                         main_align = "space_evenly",
                         expanded = True,
                         children = [
-                            render.Row(
-                                main_align = "space_evenly",
-                                expanded = False,
-                                children = [
-                                    render.Image(src = streak_icon),
-                                    render.Text(str("olly"), font = "tom-thumb"),
-                                ],
-                            ),
+                            nickname_today_view,
                             render.Row(
                                 main_align = "space_evenly",
                                 expanded = False,
@@ -474,8 +502,8 @@ def main(config):
                                 main_align = "space_evenly",
                                 expanded = False,
                                 children = [
-                                    render.Image(src = streak_icon),
-                                    render.Text(str(duolingo_totalxp_now), font = "tom-thumb"),
+                                    render.Image(src = XP_ICON),
+                                    render.Text(str(duolingo_xptoday) + "xp", font = "tom-thumb"),
                                 ],
                             ),
                         ],
@@ -486,8 +514,8 @@ def main(config):
                         main_align = "space_evenly",
                         expanded = True,
                         children = [
-                            render.Text(str(duolingo_xptoday) + " xp", font = "tom-thumb"),
                             render.Image(src = DUOLINGO_ICON),
+#                            render.Text(str(duolingo_xptoday) + " xp", font = "tom-thumb"),
                         ],
                     ),
                 ],
