@@ -21,10 +21,24 @@ load("schema.star", "schema")
 load("math.star", "math")
 load("time.star", "time")
 
+# Set applet defaults
+DEFAULT_USERNAME = "saltedlolly"
+DEFAULT_DAILY_XP_TARGET = "100"       # Choose the desired daily XP goal. The XP goal set in the Duolingo app is ignored.
+DEFAULT_TIMEZONE = "Europe/London"    # Affects when the daily XP counter resets.
+DEFAULT_DISPLAY_VIEW = "today"        # can be 'today', 'week' or 'twoweeks'
+DEFAULT_NICKNAME = "Olly"             # Max five characters. Displays on screen to identify the Duolingo user.
+DEFAULT_SHOW_NICKNAME = False         # Choose whther to display the nickname on screen.
+DEFAULT_SHOW_EXTRA_STATS = True       # Display currennt Streak and total XP score on the week chart.
+
 
 # 16 x 18
 DUOLINGO_ICON_STANDING = base64.decode("""
 UklGRh4CAABXRUJQVlA4WAoAAAASAAAADwAAEQAAQU5JTQYAAAD/////AABBTk1G9AAAAAAAAAAAAA8AABEAAIgTAAJWUDhM2wAAAC8PQAQQ/6CQkSSpBmR5lvcQDuNoXgmDbCP1/VUe4lleZGzaSJLkjhbGQlr+2eJ47nr+ywC4q2lQLAe1YYjo30RAGYjaSRA/bYxbNohAUBsEHESSpEj9zLCHAz0z/nU+v4KI/k8A/pLyEHxlU1lxshfp/VDamtUzHRfLaV4s7y/YL5fztFwOL7Lv7utV6wd7ItZ63e/kfhc+pNKozFJVAGkhVKV7kQmIqLZB5d6KZihhVakkzVMjLMop0gZJC00DCY9MWgXS8ZSRro43D1tgt3l1PZ9O59PxdjkBAABBTk1GJgAAAAAAAAAAAAAAAAAAAJCwAAJWUDhMDQAAAC8AAAAQBxAREYiI/gcAQU5NRiwAAAACAAACAAAGAAABAAD0AQAAVlA4TBMAAAAvBkAAEA8w/8M4AfMf8BiziP6HAEFOTUYsAAAAAgAAAwAABgAAAAAALAEAAFZQOEwTAAAALwYAABAPMP/DOAHzH/CoWUT/AwBBTk1GLAAAAAIAAAMAAAYAAAAAACwBAABWUDhMEwAAAC8GAAAQDzD/8z//8x/wqFlE/wMAQU5NRiwAAAACAAACAAAGAAABAAAMCgAAVlA4TBQAAAAvBkAAEBcw//M///MfgIchieh/MFJJRkboAAAAV0VCUFZQOEzbAAAALw9ABBD/oJCRJKkGZHmW9xAO42heCYNsI/X9VR7iWV5kbNpIkuSOFsZCWv7Z4njuev7LALiraVAsB7VhiOjfREAZiNpJED9tjFs2iEBQGwQcRJKkSP3MsIcDPTP+dT6/goj+TwD+kvIQfGVTWXGyF+n9UNqa1TMdF8tpXizvL9gvl/O0XA4vsu/u61XrB3si1nrd7+R+Fz6k0qjMUlUAaSFUpXuRCYiotkHl3opmKGFVqSTNUyMsyinSBkkLTQMJj0xaBdLxlJGujjcPW2C3eXU9n07n0/F2OQEAAA==
+""")
+
+# 16 x 18
+DUOLINGO_ICON_STANDING_POINT_LEFT = base64.decode("""
+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
 """)
 
 # 16 x 18
@@ -41,27 +55,37 @@ DUOLINGO_ICON_CRY = base64.decode("""
 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
 """)
 
-# 16 x 18
+# Duolingo Owl Sleeping - Animated Zzz # 16 x 18
 DUOLINGO_ICON_SLEEPING = base64.decode("""
 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
 """)
 
-# Streak Icon Flame Gold 8x7
+# Streak Flame Icon - Gold 6x7
 STREAK_ICON_GOLD = base64.decode("""
-iVBORw0KGgoAAAANSUhEUgAAAAgAAAAHCAYAAAA1WQxeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAZ0lEQVQImWWNwQ2DQBADxydFpBSao5q8Qjf0wANKQUhMHnfohOKf17M2KgAq1xcB0rxKocnlLaYGdJX7mwjjC5bBu7UDc5HtJAQTmOMDSB1BINvxP8EqGLLXMGsHopIEJ7S15VPvAD/vxTuZM4X31QAAAABJRU5ErkJggg==
+iVBORw0KGgoAAAANSUhEUgAAAAYAAAAICAYAAADaxo44AAAACXBIWXMAAAsTAAALEwEAmpwYAAAGeWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNy4xLWMwMDAgNzkuZWRhMmIzZmFjLCAyMDIxLzExLzE3LTE3OjIzOjE5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgMjMuMSAoTWFjaW50b3NoKSIgeG1wOkNyZWF0ZURhdGU9IjIwMjItMDItMjBUMTc6NDU6MjRaIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyMi0wMy0xMlQxMjozOFoiIHhtcDpNZXRhZGF0YURhdGU9IjIwMjItMDMtMTJUMTI6MzhaIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpkZjU1OTY3YS04NTUwLTQ4OTAtYjgyYi1kMzMxZmY1NjkzMWUiIHhtcE1NOkRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDpmZTgzYjE5Yy1hMDdhLWIzNDctODhiMS0wZWFkYWI4YjhiMjUiIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDowZGZjMTU2Yy1mMTlkLTQ5NjItOGFjZS04ZTExYzc3MTRlMmEiPiA8eG1wTU06SGlzdG9yeT4gPHJkZjpTZXE+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJjcmVhdGVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjBkZmMxNTZjLWYxOWQtNDk2Mi04YWNlLThlMTFjNzcxNGUyYSIgc3RFdnQ6d2hlbj0iMjAyMi0wMi0yMFQxNzo0NToyNFoiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCAyMy4xIChNYWNpbnRvc2gpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDphYzYyYzg5OS1hY2RjLTRmMmMtOGJkNy02OWFmODBhZTJkNzUiIHN0RXZ0OndoZW49IjIwMjItMDMtMTJUMTI6MTc6MTFaIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjMuMSAoTWFjaW50b3NoKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZGY1NTk2N2EtODU1MC00ODkwLWI4MmItZDMzMWZmNTY5MzFlIiBzdEV2dDp3aGVuPSIyMDIyLTAzLTEyVDEyOjM4WiIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIzLjEgKE1hY2ludG9zaCkiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+bq5RSQAAAF1JREFUCJltjLEVRAAUBGe9d+jENacaketGDwJKkRjBR3Qbzu5OVP7mKVTOGQECNO9g6cWg4lOoEOH7gaVTJSr+mlIMLQayHfVIyZCCr4pVMGQvmJVSJcERvd+ZyAVgJzcslQ/SGQAAAABJRU5ErkJggg==
 """)
 
-# Streak Icon Flame Grey 8x7
+# Streak Flame Icon - Gold Animated 6x7
+STREAK_ICON_GOLD_ANIMATED = base64.decode("""
+UklGRlQDAABXRUJQVlA4WAoAAAASAAAABQAABwAAQU5JTQYAAAD/////AABBTk1GcAAAAAAAAAAAAAUAAAcAAGQAAAJWUDhMWAAAAC8FwAEAb6CQkSSp1p9qIZ47mtEgkLRx/Tv/Ctu2QdLR///i/AfslQBSkMD7moMn5DKeACW1tWZP4QhBDJoQgwhEmJ6em1yOP7tmEf0PgAYLTCpGen/zsxVBTk1GWgAAAAAAAAEAAAUAAAQAAGQAAABWUDhMQgAAAC8FAAEQV0CQbVN/q2OcZhoEkjauf+dfYds2SDr6/1+c/wBwK0igd43nQAIoaiSFOXpRyhMJ2MB5RP8DpDBe+YtBNkFOTUYqAAAAAQAAAQAAAAAAAAAAZAAAAFZQOEwRAAAALwAAAAAHUOD696D/gYjofwAAQU5NRkoAAAABAAAAAAADAAAFAABkAAAAVlA4TDEAAAAvA0ABECcgEEjyp1pjMwFJYv8/h5AgIfn/r2X+A7CzCRiIJDO5jwCiiCCi/8FWzPEAAEFOTUZIAAAAAQAAAAAAAwAABQAAZAAAAFZQOEwwAAAALwNAARAnIBBI8qdaY7P5V9O2AdPNn26/+Q8A7Eg7GGQbOdi7F3iUR/iI/gef0eUAQU5NRl4AAAAAAAAAAAAFAAAGAABkAAAAVlA4TEYAAAAvBYABEE9AkG2z+VPd4jbTEJAk9v9zKGzbBsnw/3t5/gMAdwokrgR6BAioiSQpmvuPGGMnBwEIIMN6RP8DYAMyuibu+4csQU5NRmAAAAAAAAAAAAAFAAAGAABkAAAAVlA4TEcAAAAvBYABEFdAkG1Tf6tjnGYaBJI2rn/nX2HbNkg6+v9fnP8AcCtIoHeN50ACKKptmzrvj5FWqhiKQAzNI/ofAA/EZ+ixf9emDQBBTk1GWgAAAAAAAAEAAAUAAAQAAGQAAABWUDhMQgAAAC8FAAEQV0CQbVN/q2OcZhoEkjauf+dfYds2SDr6/1+c/wBwK0igd43nQAIoaiSFOXpRiQdE8EV+RP8DSmD72slDJ0FOTUZKAAAAAAAAAAAABAAABQAAZAAAAFZQOEwxAAAALwRAARAnIBBI8qdaYzMBSWL/P4eQICH5/69l/gOwswkYiCQzuY8Ekoggov8BC2fgAQBSSUZGZAAAAFdFQlBWUDhMWAAAAC8FwAEAb6CQkSSp1p9qIZ47mtEgkLRx/Tv/Ctu2QdLR///i/AfslQBSkMD7moMn5DKeACW1tWZP4QhBDJoQgwhEmJ6em1yOP7tmEf0PgAYLTCpGen/zsxU=
+""")
+
+# Streak Flame Icon - Greyscale 6x7
 STREAK_ICON_GREY = base64.decode("""
-iVBORw0KGgoAAAANSUhEUgAAAAgAAAAHCAYAAAA1WQxeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAX0lEQVQImWWOwREDIQwDV/RBPXSCG4GiKAc3ojxyZLiJfitpbGEbANv03r/wsG3KMeacPsGtcpu1VsYYvksFICKcmUhCEhHhV+FWZv6/2Hu/wsMAso0kWmu/s2stnR0fcx04O/RxFrwAAAAASUVORK5CYII=
+iVBORw0KGgoAAAANSUhEUgAAAAYAAAAHCAYAAAArkDztAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAWElEQVQImVWOwRHAIAgEl/Sh7diJNqJFWQ40cnk4mAkv9o7ZAUkASKL3fgB4cllrKQ9ukVBKYc4pSZgkxhgCqLUCEBGfKiciPpW7/0J3Pyozo7V2P9p72wsHTjBgL3z97gAAAABJRU5ErkJggg==
 """)
 
-# XP Icon Gold  8x7
+# Streak Flame Icon - Frozen 6x7
+STREAK_ICON_FROZEN = base64.decode("""
+iVBORw0KGgoAAAANSUhEUgAAAAYAAAAICAYAAADaxo44AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAfElEQVQImW2NoQ3DMBRE31kJCPAMlYrMMk0XMe8iHaCk45iYpE1WiEFBLP0Cx6yHTqe7dzIz/skBSAIgJiwmcBJDb8SEBd+8Aeqox4ote+XQACDXw1zg+Tl4vb8A5gCWvbbg0lDBn+fnHDa4zxO50M5Hq7pdJwsecoHg0Q9j8C1TTGG4qQAAAABJRU5ErkJggg==
+""")
+
+# XP Spark Icon - Gold  8x7
 XP_ICON_GOLD = base64.decode("""
 iVBORw0KGgoAAAANSUhEUgAAAAgAAAAHCAYAAAA1WQxeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAVklEQVQImWWP0RWAIAwDE7bSWWVCHaFwfoDAk/6ll6atAc1KXVSPzg5l2/oZ5qS9JkpJSvAcIyUiA4sLrHqfAgQGTETumv2GUi6vK9y+aNDG8PEqSXoBEck1BaldkuYAAAAASUVORK5CYII=
 """)
 
-# XP Icon Grey  8x7
+# XP Spark Icon - Greyscale  8x7
 XP_ICON_GREY = base64.decode("""
 iVBORw0KGgoAAAANSUhEUgAAAAgAAAAHCAYAAAA1WQxeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAW0lEQVQImXXOwQ0AIQhE0Y+xEfuwFO9SEt7txMLYE8SYLEdehkHcnRhVdQAzk9iVFwERSae+yRsBiqp6ay2vnHN8zpm9BRBAonfvzRjj/4cbAaqZJa61EnvvAHyjeCYxgniCQwAAAABJRU5ErkJggg==
 """)
@@ -72,17 +96,10 @@ iVBORw0KGgoAAAANSUhEUgAAAAkAAAAGCAYAAAARx7TFAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAYElE
 """)
 
 
-# Set applet defaults
-DEFAULT_USERNAME = "saltedlolly"
-DEFAULT_DAILY_XP_TARGET = "100"
-DEFAULT_TIMEZONE = "Europe/London"
-DEFAULT_DISPLAY_VIEW = "today"
-DEFAULT_NICKNAME = "Olly"
-DEFAULT_SHOW_NICKNAME = False
-
 DISPLAY_VIEW_LIST = {
     "Today": "today",
-    "Week": "week",
+    "One Week": "week",
+    "Two Weeks": "twoweeks",
 }
 
 def get_schema():
@@ -131,6 +148,13 @@ def get_schema():
             icon = "toggle-on",
             default = DEFAULT_SHOW_NICKNAME,
         ),
+        schema.Toggle(
+            id = "extra_week_stats",
+            name = "Extra Week Stats?",
+            desc = "Toggle displaying the current Streak and total XP above the Week view chart.",
+            icon = "toggle-on",
+            default = DEFAULT_SHOW_EXTRA_STATS,
+        ),
     ],
 )
 
@@ -142,6 +166,11 @@ def main(config):
     xp_target = config.get("xp_target", DEFAULT_DAILY_XP_TARGET)
     nickname = config.get("nickname", DEFAULT_NICKNAME)
     display_nickname_toggle = config.bool("display_nickname_toggle", DEFAULT_SHOW_NICKNAME)
+    display_extra_stats = config.bool("display_extra_stats", DEFAULT_SHOW_EXTRA_STATS)
+
+    # if xp_target has no value, set it to zero
+    if xp_target == "":
+        xp_target = 0
 
     nickname = nickname.upper()
     print("Nickname: " + nickname)
@@ -266,16 +295,19 @@ def main(config):
         # Get today's date
         now = time.now().in_location(timezone)
         date_now = now.format("2006-01-02").upper()
+        hour_now = now.hour
+
+        print("Hour Now: " + str(hour_now))
 
 
-        # Get the date 6 days ago
-        six_days_ago = now - time.parse_duration("144h") 
-        startDate = six_days_ago.format("2006-01-02").upper()
+        # Get the date 13 days ago
+        thirteen_days_ago = now - time.parse_duration("312h") 
+        startDate = thirteen_days_ago.format("2006-01-02").upper()
 
         # Set end date variable (today)
         endDate = date_now
 
-        print("Today's Date: " + str(endDate) + "   Date 6 days ago: " + str(startDate))
+        print("Today's Date: " + str(endDate) + "   Date 13 days ago: " + str(startDate))
 
         DUOLINGO_XP_QUERY_URL = duolingo_xpsummary_query_1 + str(duolingo_userid) + duolingo_xpsummary_query_2 + startDate + duolingo_xpsummary_query_3 + endDate + duolingo_xpsummary_query_4 + timezone
 
@@ -305,10 +337,10 @@ def main(config):
         print("Days returned: " + str(days_returned))
 
         # Setup dummy data for today
-        today_dummy_data = { "gainedXp": 0, "streakExtended": False }
+        today_dummy_data = { "gainedXp": 0, "streakExtended": False, "frozen": False }
 
         # Insert today's dummy data into JSON variable
-        if days_returned == 6:
+        if days_returned == 13:
             duolingo_xpsummary_json["summaries"].insert(0, today_dummy_data)
 
         # Now we get today's daily XP count from the xpsummary_query_json variable (which updates with live data every 15 mins)
@@ -434,31 +466,49 @@ def main(config):
         print("Streak: " + str(duolingo_streak_now) + "   Streak Extended?: " + str(is_streak_extended))
 
 
-
         # Deduce what streak icon to display on Today view
 
         if is_streak_extended == False:
             streak_icon = STREAK_ICON_GREY
         elif is_streak_extended == True:
-            streak_icon = STREAK_ICON_GOLD
+            streak_icon = STREAK_ICON_GOLD_ANIMATED
 
 
         # Deduce what XP icon to display on Today view
 
         if int(duolingo_xptoday) == 0:
             XP_ICON = XP_ICON_GREY
-        elif int(duolingo_xptoday) <= int(xp_target):
-            XP_ICON = XP_ICON_GOLD
         else:
             XP_ICON = XP_ICON_GOLD
 
 
         # Deduce which Duolingo icon should be displayed right now
 
-        if int(duolingo_xptoday) == 0:
+        if int(duolingo_xptoday) == 0 and hour_now >= 18:
+            DUOLINGO_ICON = DUOLINGO_ICON_CRY
+        elif int(duolingo_xptoday) == 0:
             DUOLINGO_ICON = DUOLINGO_ICON_SLEEPING
-        elif int(duolingo_xptoday) > 0:
+        elif int(duolingo_xptoday) > 0 and int(duolingo_xptoday) <= 45 and int(xp_target) != 0:
+            DUOLINGO_ICON = DUOLINGO_ICON_STANDING_POINT_LEFT
+        elif int(duolingo_xptoday) >=  46 and int(duolingo_xptoday) <= 45:
             DUOLINGO_ICON = DUOLINGO_ICON_STANDING
+        elif int(duolingo_xptoday) > 80 and int(duolingo_xptoday) < 100 and int(xp_target) != 0:
+            DUOLINGO_ICON = DUOLINGO_ICON_STANDING
+        elif int(duolingo_xptoday) > 80 and int(duolingo_xptoday) < 100 and int(xp_target) != 0:
+            DUOLINGO_ICON = DUOLINGO_ICON_STANDING
+
+        # Setup nickname display, if needed
+        if display_nickname_toggle == True:
+            nickname_today_view = render.Row(
+                main_align = "center",
+                cross_align = "right",
+                expanded = False,
+                children = [
+                    render.Text(str(nickname), font = "tom-thumb"),
+                ],
+            )
+        else:
+            nickname_today_view = None
 
 
 
@@ -471,7 +521,7 @@ def main(config):
         display_output = render.Box(
             render.Row(
                 expanded = True,
-                main_align = "space_evenly",
+                main_align = "center",
                 cross_align = "center",
                 children = [
                     render.Image(src = DUOLINGO_ICON_CRY),
@@ -490,24 +540,59 @@ def main(config):
             ),
         )
 
-    # DISPLAY DAY VIEW
-    # Setup day view layout
+    # DISPLAY TODAY VIEW
+    # Setup dtoay view layout
 
     if display_error_msg == False and display_view == "today":
         print("Displaying Day View on Tidbyt...")  
 
 
-        # Setup nickname display, if needed
-        if display_nickname_toggle == True:
-            nickname_today_view = render.Row(
+        # Setup progress bar. Don't display if XP target in Schema is set to 0.
+        if int(xp_target) == 0:
+            progressbar = None
+        else:
+            # Setup progress bar dimensions
+            progressbar_total_length = 25
+            progressbar_total_height = 3
+
+            # Calculate progress bar color
+            if int(duolingo_xptoday) >= int(xp_target):
+                progressbar_col = "#feeb3a"
+            else:
+                progressbar_col = "#666"
+
+            # Calculate current progress bar length
+            #   First, Work out percentage progress to target
+            progressbar_perc = (int(duolingo_xptoday) / int(xp_target)) * 100
+            #   Second, work out the current length the progress bar should be
+            progressbar_current_length = int((progressbar_total_length / 100) * progressbar_perc)
+
+            progressbar = render.Row(
                 main_align = "space_evenly",
+                cross_align = "center", # Controls vertical alignment
                 expanded = False,
                 children = [
-                    render.Text(" " + str(nickname), font = "tom-thumb"),
+                    render.Box(
+                        width=(progressbar_total_length + 2), 
+                        height=(progressbar_total_height + 2), 
+                        color="#e1e0e0",
+                        child = render.Box(
+                            width=progressbar_total_length, 
+                            height=progressbar_total_height, 
+                            color="#000000",
+                            child = render.Padding(
+                                child = render.Box(
+                                    width=progressbar_current_length, 
+                                    height=3, 
+                                    color=progressbar_col,
+                                ),
+                                pad=(0, 0, (progressbar_total_length - progressbar_current_length), 0),                 
+                            ),
+                        ),
+                    ),
+                    
                 ],
             )
-        else:
-            nickname_today_view = None
 
         display_output = render.Box(
             render.Row(
@@ -517,7 +602,7 @@ def main(config):
                 children = [
                     render.Column(
                         main_align = "space_evenly",
-                        cross_align = "centre",
+                        cross_align = "left",
                         expanded = True,
                         children = [
                             nickname_today_view,
@@ -527,6 +612,11 @@ def main(config):
                                 expanded = False,
                                 children = [
                                     render.Image(src = streak_icon),
+                                    render.Box( # spacer column
+                                        width=2, 
+                                        height=2, 
+                                        color="#000000",
+                                    ),
                                     render.Text(str(duolingo_streak_now), font = "tom-thumb"),
                                 ],
                             ),
@@ -544,18 +634,10 @@ def main(config):
 
                     # Column to hold pricing text evenly distrubuted accross 1-3 rows
                     render.Column(
-                        main_align = "space_evenly",
+                        main_align = "center",
+                        cross_align = "center", # Controls vertical alignment
                         expanded = True,
                         children = [
-                            render.Row(
-                                main_align = "space_evenly",
-                                cross_align = "end", # Controls vertical alignment
-                                expanded = False,
-                                children = [
-                                    render.Image(src = streak_icon),
-                                    render.Text(str(duolingo_streak_now), font = "tom-thumb"),
-                                ],
-                            ),
                             render.Row(
                                 main_align = "space_evenly",
                                 cross_align = "end", # Controls vertical alignment
@@ -564,11 +646,326 @@ def main(config):
                                     render.Image(src = DUOLINGO_ICON),
                                 ],
                             ),
+                            progressbar,
+                            
                         ],
                     ),
                 ],
             ),
         )
+
+    # DISPLAY WEEK VIEW (OR TWO WEEK VIEW)
+    # Setup week view layout
+
+    if display_error_msg == False and (display_view == "week" or display_view == "twoweeks"):
+        print("Displaying Week View on Tidbyt...")  
+
+        # Setup verticle bar dimensions
+        vertbar_total_width = 5
+        vertbar_total_height = 23
+
+        # Put the XP scores for the week into a list called week_xp_scores. The first entry will be  days ago. The last entry will be today.
+        week_xp_scores = []
+        for daynum in range(0,len(duolingo_xpsummary_json["summaries"])):
+            day_xp = int(duolingo_xpsummary_json["summaries"][daynum]["gainedXp"])
+            week_xp_scores.append(day_xp)
+
+        print( "Two Week's XP Scores: " + str(week_xp_scores))
+
+        # Slice the current week's xp scores, if we are only displaying the last week of data
+        if display_view == "week":
+            week_xp_scores = (week_xp_scores[0:7])
+            print( "One Week's XP Scores: " + str(week_xp_scores))
+
+        # Get the highest value from the available daily scores. This is used to setup the upper_chart_value.
+        week_xp_scores = sorted(week_xp_scores)
+        week_xp_highest = int(week_xp_scores[-1])
+
+        print( "Week's Highest XP Score: " + str(week_xp_highest))
+
+        # Set the upper chart value, based on the highest daily score from the last week
+        xp_target = int(xp_target)
+        if week_xp_highest <= xp_target and xp_target > 0:
+            upper_chart_value = xp_target # Set upper chart height to the xp_target if none if the last weeks scores have exceeded it
+        elif week_xp_highest > xp_target:
+            upper_chart_value = week_xp_highest # Otherwise set the upper_chart_value to be the highest daily xp score from the last two weeks
+
+        week_progress_chart = []
+        vertbar_col = []
+
+
+        # Setup chart display for the past week. Cycles though each day working backwards towards today.
+        for daynum in range (6,-1,-1):
+
+            xp_day_score = duolingo_xpsummary_json["summaries"][daynum]["gainedXp"]
+
+            if display_view == "twoweeks":
+               xp_day_score_lastweek = duolingo_xpsummary_json["summaries"][daynum + 7]["gainedXp"]
+
+            # Display different shade of color bar if the XP score was not hit
+            if int(xp_day_score) >= int(xp_target):
+                vertbar_col = "#feea3a"
+                vertbar_col_header = "#ea3afe"
+            else:
+                vertbar_col = "#9e9e9e"
+                vertbar_col_header = "#e1e0e0"
+
+            # Last weeks bar color
+            vertbar_lastweek_col = "#3a3a3a"
+
+            # Calculate this week vertical bar length
+            # First, work out percentage progress towards the upper_chart_value
+            vertbar_current_perc = (int(xp_day_score) / int(upper_chart_value)) * 100
+            # Second, work out the current height the vertical bar should be
+            vertbar_current_height = int((vertbar_total_height / 100) * vertbar_current_perc)
+
+            # Calculate last weeks vertical bar length, if it is being displayed
+            if display_view == "twoweeks":
+                # First, work out percentage progress towards the upper_chart_value
+                vertbar_lastweek_perc = (int(xp_day_score_lastweek) / int(upper_chart_value)) * 100
+                # Second, work out the current height the vertical bar should be
+                vertbar_lastweek_height = int((vertbar_total_height / 100) * vertbar_lastweek_perc)
+            else:
+                vertbar_lastweek_height = 0
+
+
+            oneweek_bar = [
+                
+                # Spacer bar
+                render.Box( # spacer column
+                    width=1, 
+                    height=(vertbar_total_height), 
+                    color="#000000",
+                ),
+
+                # This week full size  bar
+                render.Box(
+                    width=vertbar_total_width, 
+                    height=vertbar_total_height, 
+                    color="#000000",
+                    child = render.Padding(
+                        child = render.Box(
+                            width=5, 
+                            height=vertbar_current_height, 
+                            color=str(vertbar_col),
+
+                            child = render.Padding(
+                                child = render.Box(
+                                    width=5, 
+                                    height=1, 
+                                    color=str(vertbar_col_header),
+                                ),
+                                pad=(0, 0, 0, vertbar_current_height - 1),                 
+                            ),
+                        ),
+                        pad=(0, (vertbar_total_height - vertbar_current_height), 0, 0),                 
+                    ),
+                )
+
+            ]
+
+            
+            twoweeks_bar = [
+                
+                # Spacer bar
+                render.Box( # spacer column
+                    width=1, 
+                    height=(vertbar_total_height), 
+                    color="#000000",
+                ),
+
+                # Last week narrow bar
+                render.Box(
+                    width=2, 
+                    height=(vertbar_total_height), 
+                    color="#e1e0e0",
+                    child = render.Box(
+                        width=2, 
+                        height=vertbar_total_height, 
+                        color="#000000",
+                        child = render.Padding(
+                            child = render.Box(
+                                width=2, 
+                                height=vertbar_lastweek_height, 
+                                color=str(vertbar_lastweek_col),
+                            ),
+                            pad=(0, (vertbar_total_height - vertbar_lastweek_height), 0, 0),                 
+                        ),
+                    ),
+                ),
+                # This week wide bar
+                render.Box(
+                    width=3, 
+                    height=(vertbar_total_height), 
+                    color="#e1e0e0",
+                    child = render.Box(
+                        width=3, 
+                        height=vertbar_total_height, 
+                        color="#000000",
+                        child = render.Padding(
+                            child = render.Box(
+                                width=3, 
+                                height=vertbar_current_height, 
+                                color=str(vertbar_col),
+
+                                child = render.Padding(
+                                    child = render.Box(
+                                        width=3, 
+                                        height=1, 
+                                        color=str(vertbar_col_header),
+                                    ),
+                                    pad=(0, 0, 0, vertbar_current_height - 1),                 
+                                ),
+
+                            ),
+                            pad=(0, (vertbar_total_height - vertbar_current_height), 0, 0),                 
+                        ),
+                    ),
+                )
+            ]
+
+            # Choose which display to show
+            if display_view == "week":
+                show_chartbar = oneweek_bar
+            elif display_view == "twoweeks":
+                show_chartbar = twoweeks_bar
+
+            vertbar = render.Row(
+                main_align = "space_evenly",
+                cross_align = "center", # Controls vertical alignment
+                expanded = False,
+                children = show_chartbar,
+            )
+
+            # Setup which streak icon to display
+            streak_icon_day_frozen = bool(duolingo_xpsummary_json["summaries"][daynum]["frozen"])
+            streak_icon_day_extended = bool(duolingo_xpsummary_json["summaries"][daynum]["streakExtended"])
+
+            if streak_icon_day_extended == True:
+                streak_icon = STREAK_ICON_GOLD
+            elif streak_icon_day_frozen == True:
+                streak_icon = STREAK_ICON_FROZEN
+            else:
+                streak_icon = STREAK_ICON_GREY
+
+
+            # Get day of week:
+            if daynum == 0: # TODAY
+                dayofweek = now
+            elif daynum == 1: # YESTERDAY
+                dayofweek = now - time.parse_duration("24h")
+            elif daynum == 2: # TWO DAYS AGO
+                dayofweek = now - time.parse_duration("48h")
+            elif daynum == 3: # THREE DAYS AGO
+                dayofweek = now - time.parse_duration("72h")
+            elif daynum == 4: # FOUR DAYS AGO
+                dayofweek = now - time.parse_duration("96h")
+            elif daynum == 5: # FIVE DAYS AGO
+                dayofweek = now - time.parse_duration("120h")
+            elif daynum == 6: # SIX DAYS AGO
+                dayofweek = now - time.parse_duration("144h")
+
+
+            # Convert day of week to single lower case letter
+            dayofweek_letter = dayofweek.format("Mon").lower()[0]
+
+            print( "Day of Week: " + str(dayofweek_letter) + "  XP Score: " + str(xp_day_score))
+
+
+            # Get current day of week
+ #           if dayofweek = "m":
+ #               dayofweek_letter = now.format("M").upper()
+ #               dayofweek_font = now.format("M").upper()
+ #               dayofweek_text_color = now.format("M").upper()
+
+
+
+            day_progress_chart = render.Column(
+                main_align = "center",
+                cross_align = "center", # Controls vertical alignment
+                expanded = True,
+                children = [
+                    vertbar,
+                    render.Row(
+                        main_align = "space_evenly",
+                        cross_align = "end", # Controls vertical alignment
+                        expanded = False,
+                        children = [
+                            render.Box(
+                                width=2, 
+                                height=7, 
+                            ),
+                            render.Text(str(dayofweek_letter), font = "tom-thumb"),
+                        ],
+                    ),
+                    
+
+                ]
+            )
+
+            week_progress_chart.append(day_progress_chart)
+
+
+        print ("Week Progress Chart: " + str(week_progress_chart))
+
+
+        display_output = render.Box(
+
+
+
+            render.Row(
+                expanded = True,
+                main_align = "space_evenly",
+                cross_align = "center",
+                children = [
+
+                    # Display Duolingo icon and username
+                    render.Column(
+                        main_align = "center",
+                        cross_align = "center", # Controls vertical alignment
+                        expanded = True,
+                        children = [
+
+                            render.Row(
+                                main_align = "space_evenly",
+                                cross_align = "end", # Controls vertical alignment
+                                expanded = False,
+                                children = [
+                                    render.Image(src = DUOLINGO_ICON_STANDING),
+                                ],
+                            ),
+                            render.Box(
+                                width=21, 
+                                height=2, 
+                                color="#000000",
+                            ),                            
+                            nickname_today_view
+                        ],
+                    ),
+
+                    # Display Progress Chart
+                    render.Column(
+                        main_align = "space_evenly",
+                        cross_align = "center", # Controls vertical alignment
+                        expanded = True,
+                        children = [
+
+                            # Display week progress chart
+                            render.Row(
+                                main_align = "end",
+                                cross_align = "end",
+                                expanded = True,
+                                children = week_progress_chart,
+                            ),                                                    
+                        ],
+                    ),
+
+                ],
+            ),
+        )
+
+
+
 
     return render.Root(
         child = display_output,
