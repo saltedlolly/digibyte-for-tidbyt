@@ -300,13 +300,11 @@ def main(config):
         thirteen_days_ago = now - time.parse_duration("312h") # 312h /108
         startDate = thirteen_days_ago.format("2006-01-02").upper()
 
-        # TEMP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! **************************************
-        startDate = "2022-02-01"
 
         # Set end date variable (today)
         endDate = date_now
 
-        print("Today's Date: " + str(endDate) + "   Date 13 days ago: " + str(startDate))
+        print("Start Date: " + str(startDate) + "   End Date: " + str(endDate))
 
         DUOLINGO_XP_QUERY_URL = duolingo_xpsummary_query_1 + str(duolingo_userid) + duolingo_xpsummary_query_2 + startDate + duolingo_xpsummary_query_3 + endDate + duolingo_xpsummary_query_4 + timezone
 
@@ -360,19 +358,19 @@ def main(config):
         # Work out how many days of data is available (this should be 14 unless the user has only just joined Duolingo witin the last 14 days)
         days_returned = len(duolingo_xpsummary_json["summaries"])
         if days_returned >= 14:
-        	print("Days with data: " + str(days_returned))
+            print("Days with data: " + str(days_returned))
         else:
-        	print("Days with data: " + str(days_returned) + "   (Query returned less than 14 days of data. New Duolingo user?)")
+            print("Days with data: " + str(days_returned) + "   (Query returned less than 14 days of data. New Duolingo user?)")
 
-        	# insert historical dummy data if less than 14 days of data exists
-        	days_of_dummy_data_to_add = 14 - days_returned
-        	for daynum in range(0, days_of_dummy_data_to_add):
-        		duolingo_xpsummary_json["summaries"].append(dummy_data)
-        	print("Total days after inserting dummy data:  " + str(len(duolingo_xpsummary_json["summaries"])))
+            # insert historical dummy data if less than 14 days of data exists
+            days_of_dummy_data_to_add = 14 - days_returned
+            for daynum in range(0, days_of_dummy_data_to_add):
+                duolingo_xpsummary_json["summaries"].append(dummy_data)
+            print("Total days after inserting dummy data:  " + str(len(duolingo_xpsummary_json["summaries"])))
 
         # if the user only has 7 or less days of data available, and the two week chart view is selected, only display the one week view
         if days_returned <= 7 and display_view == "twoweeks":
-        	display_view = "week"
+            display_view = "week"
 
 
         # Now we get today's daily XP count from the xpsummary_query_json variable (which updates with live data every 15 mins)
@@ -499,7 +497,6 @@ def main(config):
 
 
         # Deduce what streak icon to display on Today view
-
         if is_streak_extended == False:
             streak_icon = STREAK_ICON_GREY
         elif is_streak_extended == True:
@@ -507,7 +504,6 @@ def main(config):
 
 
         # Deduce what XP icon to display on Today view
-
         if int(duolingo_xptoday) == 0:
             XP_ICON = XP_ICON_GREY
         else:
@@ -515,9 +511,6 @@ def main(config):
 
 
         # Deduce which Duolingo icon should be displayed right now
-
-        print ("XP Today: " + str(duolingo_xptoday))
-
         if int(duolingo_xptoday) == 0 and hour_now >= 18:
             DUOLINGO_ICON = DUOLINGO_ICON_CRY
         elif int(duolingo_xptoday) == 0:
@@ -533,8 +526,8 @@ def main(config):
         elif int(duolingo_xptoday) > 80 and int(duolingo_xptoday) < 100 and int(xp_target) != 0:
             DUOLINGO_ICON = DUOLINGO_ICON_STANDING
         else:
-        	print("Error: Could not select specific Duolingo icon, so reverting to the default standing icon.")
-        	DUOLINGO_ICON = DUOLINGO_ICON_STANDING
+            print("Error: Could not select specific Duolingo icon, so reverting to the default standing icon.")
+            DUOLINGO_ICON = DUOLINGO_ICON_STANDING
 
         # Setup nickname display, if needed
         if display_nickname_toggle == True:
@@ -705,9 +698,9 @@ def main(config):
         print("Display Extra Stats: " + str(display_extra_stats))
 
         if display_extra_stats == True:
-        	vertbar_total_height = 16
+            vertbar_total_height = 16
         else:
-        	vertbar_total_height = 24
+            vertbar_total_height = 24
 
 
         # Put the XP scores for the week into a list called week_xp_scores. The first entry will be  days 13 ago. The last entry will be today.
@@ -756,7 +749,7 @@ def main(config):
             # Setup vertbar display variables for this day
             if xp_day_score > 0:
                     display_frozen = False
-                    display_missedday = False
+                    display_missed = False
                     display_repaired = False
             else:
                 is_frozen = bool(duolingo_xpsummary_json["summaries"][daynum]["frozen"])
@@ -764,48 +757,45 @@ def main(config):
                 is_streak_extended = bool(duolingo_xpsummary_json["summaries"][daynum]["streakExtended"])
                 if daynum != 0 and is_frozen == True:
                     display_frozen = True
-                    display_missedday = False
+                    display_missed = False
                     display_repaired = False
                 elif daynum != 0 and is_frozen == False and is_streak_extended == False and is_repaired == False:
                     display_frozen = False
-                    display_missedday = True
+                    display_missed = True
                     display_repaired = False
                 elif daynum != 0 and is_frozen == False and is_streak_extended == False and is_repaired == True:
                     display_frozen = False
-                    display_missedday = False
+                    display_missed = False
                     display_repaired = True
-
-
 
             if display_view == "twoweeks":
                 xp_day_score_lastweek = duolingo_xpsummary_json["summaries"][daynum + 7]["gainedXp"]
 
+                # Setup this day last week's XP score to 0 if it is Null
+                if str(xp_day_score_lastweek) == None:
+                    xp_day_score_lastweek = 0
 
-	            # Setup this day last week's XP score to 0 if it is Null
-#	        	if xp_day_score_lastweek == None:
-#	                xp_day_score_lastweek = 0
-#
-	            # Setup vertbar display variables for this day last week
-#	            if xp_day_score_lastweek > 0:
-#	                    display_frozen_lastweek = False
-#	                    display_missedday_lastweek = False
-#	                    display_repaired_lastweek = False
-#	            else:
-#	                is_frozen_lastweek = bool(duolingo_xpsummary_json["summaries"][daynum + 7]["frozen"])
-#	                is_repaired_lastweek = bool(duolingo_xpsummary_json["summaries"][daynum + 7]["repaired"])
-#	                is_streak_extended_lastweek = bool(duolingo_xpsummary_json["summaries"][daynum + 7]["streakExtended"])
-#	                if daynum != 0 and is_frozen == True:
-#	                    display_frozen_lastweek = True
-#	                    display_missedday_lastweek = False
-#	                    display_repaired_lastweek = False
-#	                elif daynum != 0 and is_frozen == False and is_streak_extended == False and is_repaired == False:
-#	                    display_frozen_lastweek = False
-#	                    display_missedday_lastweek = True
-#	                    display_repaired_lastweek = False
-#	                elif daynum != 0 and is_frozen == False and is_streak_extended == False and is_repaired == True:
-#	                    display_frozen_lastweek = False
-#	                    display_missedday_lastweek = False
-#	                    display_repaired_lastweek = True
+                # Setup vertbar display variables for this day last week
+                if xp_day_score_lastweek > 0:
+                        display_frozen_lastweek = False
+                        display_missed_lastweek = False
+                        display_repaired_lastweek = False
+                else:
+                    is_frozen_lastweek = bool(duolingo_xpsummary_json["summaries"][daynum + 7]["frozen"])
+                    is_repaired_lastweek = bool(duolingo_xpsummary_json["summaries"][daynum + 7]["repaired"])
+                    is_streak_extended_lastweek = bool(duolingo_xpsummary_json["summaries"][daynum + 7]["streakExtended"])
+                    if daynum != 0 and is_frozen == True:
+                        display_frozen_lastweek = True
+                        display_missed_lastweek = False
+                        display_repaired_lastweek = False
+                    elif daynum != 0 and is_frozen == False and is_streak_extended == False and is_repaired == False:
+                        display_frozen_lastweek = False
+                        display_missed_lastweek = True
+                        display_repaired_lastweek = False
+                    elif daynum != 0 and is_frozen == False and is_streak_extended == False and is_repaired == True:
+                        display_frozen_lastweek = False
+                        display_missed_lastweek = False
+                        display_repaired_lastweek = True
 
 
             # Display different shade of color bar if the XP score was not hit
@@ -816,8 +806,13 @@ def main(config):
                 vertbar_col = "#9e9e9e"
                 vertbar_col_header = "#e1e0e0"
 
-            # Last weeks bar color
-            vertbar_lastweek_col = "#3a3a3a"
+            # Same again but for last weeks color bars
+            if int(xp_day_score_lastweek) >= int(xp_target):
+                vertbar_lastweek_col = "#feea3a"
+                vertbar_lastweek_col_header = "#ea3afe"
+            else:
+                vertbar_lastweek_col = "#3a3a3a"
+                vertbar_lastweek_col_header = "#e1e0e0"
 
             # Calculate this week vertical bar length
             # First, work out percentage progress towards the upper_chart_value
@@ -835,7 +830,7 @@ def main(config):
                 vertbar_lastweek_height = 0
 
             # Display normal one week proress bar
-            oneweek_bar = [
+            oneweek_bar_normal = [
 
                 # This week full size  bar
                 render.Box(
@@ -870,6 +865,33 @@ def main(config):
 
             ]
 
+            oneweek_bar_missed = [
+
+                # This week full size  bar
+                render.Box(
+                    width=vertbar_total_width, 
+                    height=vertbar_total_height, 
+                    color="#000000",
+                    child = render.Padding(
+                        child = render.Box(
+                            width=5, 
+                            height=vertbar_current_height, 
+                            color="#000000",
+                            child = render.Text("x", color = "#ff0000",),         
+                        ),
+                        pad=(0, (vertbar_total_height - 6), 0, 0),                 
+                    ),
+                ),
+                
+                # Spacer bar
+                render.Box( # spacer column
+                    width=1, 
+                    height=(vertbar_total_height), 
+                    color="#000000",
+                ),
+
+            ]
+
             oneweek_bar_frozen = [
 
                 # This week full size  bar
@@ -881,13 +903,49 @@ def main(config):
                         child = render.Box(
                             width=5, 
                             height=vertbar_current_height, 
-                            color=str(vertbar_col),
+                            color="#000000",
                             child = render.Image(src = STREAK_ICON_FROZEN),             
+                        ),
+                        pad=(0, (vertbar_total_height - 7), 0, 0),                 
+                    ),
+                ),
+                
+                # Spacer bar
+                render.Box( # spacer column
+                    width=1, 
+                    height=(vertbar_total_height), 
+                    color="#000000",
+                ),
+
+            ]
+
+            # Display normal one week proress bar
+            oneweek_bar_repaired = [
+
+                # This week full size  bar
+                render.Box(
+                    width=vertbar_total_width, 
+                    height=vertbar_total_height, 
+                    color="#000000",
+                    child = render.Padding(
+                        child = render.Box(
+                            width=5, 
+                            height=2, 
+                            color=str(vertbar_col),
+
+                            child = render.Padding(
+                                child = render.Box(
+                                    width=5, 
+                                    height=1, 
+                                    color=str(vertbar_col_header),
+                                ),
+                                pad=(0, 0, 0, vertbar_current_height - 1),                 
+                            ),
                         ),
                         pad=(0, (vertbar_total_height - vertbar_current_height), 0, 0),                 
                     ),
                 ),
-                
+
                 # Spacer bar
                 render.Box( # spacer column
                     width=1, 
@@ -896,66 +954,60 @@ def main(config):
                 ),
 
             ]
+
+            twoweeks_bar_thisweek_normal = render.Box(
+                width=3, 
+                height=(vertbar_total_height), 
+                color="#e1e0e0",
+                child = render.Box(
+                    width=3, 
+                    height=vertbar_total_height, 
+                    color="#000000",
+                    child = render.Padding(
+                        child = render.Box(
+                            width=3, 
+                            height=vertbar_current_height, 
+                            color=str(vertbar_col),
+
+                            child = render.Padding(
+                                child = render.Box(
+                                    width=3, 
+                                    height=1, 
+                                    color=str(vertbar_col_header),
+                                ),
+                                pad=(0, 0, 0, vertbar_current_height - 1),                 
+                            ),
+
+                        ),
+                        pad=(0, (vertbar_total_height - vertbar_current_height), 0, 0),                 
+                    ),
+                ),
+            )
+
+            twoweeks_bar_lastweek_normal = render.Box(
+                width=2, 
+                height=(vertbar_total_height), 
+                color="#e1e0e0",
+                child = render.Box(
+                    width=2, 
+                    height=vertbar_total_height, 
+                    color="#000000",
+                    child = render.Padding(
+                        child = render.Box(
+                            width=2, 
+                            height=vertbar_lastweek_height, 
+                            color=str(vertbar_lastweek_col),
+                        ),
+                        pad=(0, (vertbar_total_height - vertbar_lastweek_height), 0, 0),                 
+                    ),
+                ),
+            )
 
             
-            twoweeks_bar = [
 
-                # Last week narrow bar
-                render.Box(
-                    width=2, 
-                    height=(vertbar_total_height), 
-                    color="#e1e0e0",
-                    child = render.Box(
-                        width=2, 
-                        height=vertbar_total_height, 
-                        color="#000000",
-                        child = render.Padding(
-                            child = render.Box(
-                                width=2, 
-                                height=vertbar_lastweek_height, 
-                                color=str(vertbar_lastweek_col),
-                            ),
-                            pad=(0, (vertbar_total_height - vertbar_lastweek_height), 0, 0),                 
-                        ),
-                    ),
-                ),
-                # This week wide bar
-                render.Box(
-                    width=3, 
-                    height=(vertbar_total_height), 
-                    color="#e1e0e0",
-                    child = render.Box(
-                        width=3, 
-                        height=vertbar_total_height, 
-                        color="#000000",
-                        child = render.Padding(
-                            child = render.Box(
-                                width=3, 
-                                height=vertbar_current_height, 
-                                color=str(vertbar_col),
 
-                                child = render.Padding(
-                                    child = render.Box(
-                                        width=3, 
-                                        height=1, 
-                                        color=str(vertbar_col_header),
-                                    ),
-                                    pad=(0, 0, 0, vertbar_current_height - 1),                 
-                                ),
 
-                            ),
-                            pad=(0, (vertbar_total_height - vertbar_current_height), 0, 0),                 
-                        ),
-                    ),
-                ),
-                
-                # Spacer bar
-                render.Box( # spacer column
-                    width=1, 
-                    height=(vertbar_total_height), 
-                    color="#000000",
-                ),
-            ]
+
 
 
             # TESTING VARIABLES
@@ -963,20 +1015,51 @@ def main(config):
 
             # Choose what to display - bar, frozen icon, missed, blank or flashing progress (used for today)
             if display_view == "week":
-            	if display_frozen == True:
-            		oneweek_bar = oneweek_bar_frozen  						# display the frozen icon
- #           	elif display_missed == True:
- #           		oneweek_bar = one_week_bar_missed						# display the missed day cross icon
- #           	elif display_repaired == True:
- #           		oneweek_bar = one_week_bar_repaired						# display the band aid icon
- #           	elif daynum == 0 and xp_day_score == 0:
- #           		oneweek_bar = one_week_bar_today_flashing_start			# display the flashing progress indicator
- #           	elif daynum == 0 and xp_day_score > 0:
- #           		oneweek_bar = one_week_bar_today_flashing_progress		# display the flashing progress indicator
- #           	elif daynum != 0 and xp_day_score > 0:
- #           		oneweek_bar = one_week_bar_today_flashing_progress		# display the flashing progress indicator
-            	else:
-            		oneweek_bar = oneweek_bar								# display the normal progress indicator
+                if display_frozen == True:
+                    oneweek_bar = oneweek_bar_frozen                        # display the frozen icon
+                elif display_missed == True:
+                    oneweek_bar = oneweek_bar_missed                        # display the missed day cross icon
+                elif display_repaired == True:
+                    oneweek_bar = oneweek_bar_repaired                      # display the band aid icon
+ #              elif daynum == 0 and xp_day_score == 0:
+ #                  oneweek_bar = oneweek_bar_today_flashing_start          # display the flashing progress indicator
+ #              elif daynum == 0 and xp_day_score > 0:
+ #                  oneweek_bar = oneweek_bar_today_flashing_progress       # display the flashing progress indicator
+ #              elif daynum != 0 and xp_day_score > 0:
+ #                  oneweek_bar = oneweek_bar_today_flashing_progress       # display the flashing progress indicator
+                else:
+                    oneweek_bar = oneweek_bar_normal                               # display the normal progress indicator
+
+            if display_view == "twoweeks":
+ #               if display_frozen_lastweek == True:
+ #                   twoweeks_bar_lastweek = twoweeks_bar_lastweek_frozen                        # display the frozen icon
+ #                   twoweeks_bar_thisweek = twoweeks_bar_thisweek_frozen                        # display the frozen icon
+ #               elif display_missed_lastweek == True:
+ #                   twoweeks_bar_lastweek = twoweeks_bar_lastweek_missed                        # display the missed day cross icon
+ #                   twoweeks_bar_thisweek = twoweeks_bar_thisweek_missed                        # display the missed day cross icon
+ #               elif display_repaired_lastweek == True:
+ #                   twoweeks_bar_lastweek = twoweeks_bar_lastweek_repaired                      # display the band aid icon
+ #                   twoweeks_bar_thisweek = twoweeks_bar_thisweek_repaired                      # display the band aid icon
+ #               else:
+                    twoweeks_bar_lastweek = twoweeks_bar_lastweek_normal    # display the normal progress indicator
+                    twoweeks_bar_thisweek = twoweeks_bar_thisweek_normal
+
+            twoweeks_bar = [
+
+                # Last week narrow bar
+                twoweeks_bar_lastweek,
+
+                # This week wide bar
+                twoweeks_bar_thisweek,
+                
+                # Spacer bar
+                render.Box( # spacer column
+                    width=1, 
+                    height=(vertbar_total_height), 
+                    color="#000000",
+                ),
+            ]
+
 
             # Choose which display to show
             if display_view == "week":
@@ -1030,9 +1113,9 @@ def main(config):
             dayofweek_letter = dayofweek.format("Mon").lower()[0]
 
             if display_view == "week":
-            	print( "Day of Week: " + str(dayofweek_letter) + "  XP Score: " + str(xp_day_score))
+                print( "Day of Week: " + str(dayofweek_letter) + "  XP Score: " + str(xp_day_score))
             elif display_view == "twoweeks":
-            	print( "Day of Week: " + str(dayofweek_letter) + "  Last Week XP Score: " + str(xp_day_score_lastweek)+ "   This Week XP Score: " + str(xp_day_score))
+                print( "Day of Week: " + str(dayofweek_letter) + "  Last Week XP Score: " + str(xp_day_score_lastweek)+ "   This Week XP Score: " + str(xp_day_score))
 
 
             # Get current day of week
