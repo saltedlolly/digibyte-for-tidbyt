@@ -166,27 +166,30 @@ def main(config):
     xp_target = config.get("xp_target", DEFAULT_DAILY_XP_TARGET)
     nickname = config.get("nickname", DEFAULT_NICKNAME)
     display_nickname_toggle = config.bool("display_nickname_toggle", DEFAULT_SHOW_NICKNAME)
-    display_extra_stats = config.bool("display_extra_stats", DEFAULT_SHOW_EXTRA_STATS)
+    display_extra_stats = config.bool("extra_week_stats", DEFAULT_SHOW_EXTRA_STATS)
 
     # if xp_target has no value, set it to zero
     if xp_target == "":
         xp_target = 0
 
-    nickname = nickname.upper()
-    print("Nickname: " + nickname)
+    # Trim nickname to only display first five characters
+    nickname = nickname[:5].upper()
 
     # Setup user cache keys
     duolingo_cache_key_username = "duolingo_%s" % duolingo_username
+
     duolingo_cache_key_userid = "%s_userid" % duolingo_cache_key_username
     duolingo_cache_key_xpsummary_json = "%s_xpsummary_json" % duolingo_cache_key_username
     duolingo_cache_key_main_json = "%s_main_json" % duolingo_cache_key_username
     duolingo_cache_key_saveddate = "%s_saveddate" % duolingo_cache_key_username
     duolingo_cache_key_totalxp_daystart = "%s_totalxp_daystart" % duolingo_cache_key_username
     duolingo_cache_key_streak_daystart = "%s_streak_daystart" % duolingo_cache_key_username
+    duolingo_cache_key_xp_query_time = "%s_xp_query_time" % duolingo_cache_key_username
 
     # Get Cache variables
     duolingo_userid_cached = cache.get(duolingo_cache_key_userid)
     duolingo_xpsummary_json_cached = cache.get(duolingo_cache_key_xpsummary_json)
+    duolingo_xp_query_time_cached = cache.get(duolingo_cache_key_xp_query_time)
     duolingo_main_json_cached = cache.get(duolingo_cache_key_main_json)
     duolingo_saveddate_cached = cache.get(duolingo_cache_key_saveddate)
     duolingo_totalxp_daystart_cached = cache.get(duolingo_cache_key_totalxp_daystart)
@@ -229,11 +232,6 @@ def main(config):
             # update userid cache timer
             cache.set(duolingo_cache_key_userid, duolingo_userid, ttl_seconds=604800)
             display_error_msg = False
-#    else:
-#        print("Error! No Duolingo username provided.")
-#        display_error_msg = True
-#        error_message_1 = "username"
-#        error_message_2 = "is blank"
 
     # Lookup userId from supplied username (if not already found in cache)
     if do_duolingo_main_query == True:
@@ -297,12 +295,13 @@ def main(config):
         date_now = now.format("2006-01-02").upper()
         hour_now = now.hour
 
-        print("Hour Now: " + str(hour_now))
-
 
         # Get the date 13 days ago
-        thirteen_days_ago = now - time.parse_duration("312h") 
+        thirteen_days_ago = now - time.parse_duration("312h") # 312h /108
         startDate = thirteen_days_ago.format("2006-01-02").upper()
+
+        # TEMP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! **************************************
+        startDate = "2022-02-01"
 
         # Set end date variable (today)
         endDate = date_now
@@ -313,6 +312,10 @@ def main(config):
 
         if duolingo_xpsummary_json_cached != None:
             duolingo_xpsummary_json = json.decode(duolingo_xpsummary_json_cached)
+
+            # Convert xp_query_time string back in to time.time
+            xp_query_time = time.parse_time(duolingo_xp_query_time_cached, "Mon, 02 Jan 2006 15:04:05 -0700")
+
             print("XP summary data retrieved from cache.")
             live_xp_data = False
         else:
@@ -327,21 +330,50 @@ def main(config):
             else:
                 display_error_msg = False
                 duolingo_xpsummary_json = xpsummary_query.json()
+                xp_query_time = now
                 live_xp_data = True
                 # Show error if username was not recognised
                 print("XP summary data retrieved from duolingo.com")
                 cache.set(duolingo_cache_key_xpsummary_json, json.encode(duolingo_xpsummary_json), ttl_seconds=900)
 
-        # Work out whther today's data is being returned or not (by checking the number of days in string)
+                # Format current time into string
+                time_now_formatted = now.format("Mon, 02 Jan 2006 15:04:05 -0700")
+                print("Time Now (Formatted for cache): " + str(time_now_formatted))
+                cache.set(duolingo_cache_key_xp_query_time, str(time_now_formatted), ttl_seconds=900)
+
+        # Lookup the date from the first 'date' value in JSON too see if it is today's data
+        time_of_first_entry_unix_time = int(duolingo_xpsummary_json["summaries"][0]["date"])
+        time_of_first_entry = time.from_timestamp(time_of_first_entry_unix_time)
+        date_of_first_entry = time_of_first_entry.format("2006-01-02")
+        
+
+        # Setup dummy data for use on days with no data available
+        dummy_data = { "gainedXp": 0, "streakExtended": False, "frozen": False, "repaired": False, "dummyData": True    }
+
+        # If the data is from yesterday, insert today's dummy data into JSON variable. (This will be replaced by the actual data once it becomes available.)
+        if date_of_first_entry != date_now:
+            duolingo_xpsummary_json["summaries"].insert(0, dummy_data)
+            print("Date of the most recent XP data: " + str(date_of_first_entry) + "   (Dummy data has been inserted for today.)")
+        else:
+            print("Date of the most recent XP data: " + str(date_of_first_entry) + "   (No dummy data needed for today.)")
+
+        # Work out how many days of data is available (this should be 14 unless the user has only just joined Duolingo witin the last 14 days)
         days_returned = len(duolingo_xpsummary_json["summaries"])
-        print("Days returned: " + str(days_returned))
+        if days_returned >= 14:
+        	print("Days with data: " + str(days_returned))
+        else:
+        	print("Days with data: " + str(days_returned) + "   (Query returned less than 14 days of data. New Duolingo user?)")
 
-        # Setup dummy data for today
-        today_dummy_data = { "gainedXp": 0, "streakExtended": False, "frozen": False }
+        	# insert historical dummy data if less than 14 days of data exists
+        	days_of_dummy_data_to_add = 14 - days_returned
+        	for daynum in range(0, days_of_dummy_data_to_add):
+        		duolingo_xpsummary_json["summaries"].append(dummy_data)
+        	print("Total days after inserting dummy data:  " + str(len(duolingo_xpsummary_json["summaries"])))
 
-        # Insert today's dummy data into JSON variable
-        if days_returned == 13:
-            duolingo_xpsummary_json["summaries"].insert(0, today_dummy_data)
+        # if the user only has 7 or less days of data available, and the two week chart view is selected, only display the one week view
+        if days_returned <= 7 and display_view == "twoweeks":
+        	display_view = "week"
+
 
         # Now we get today's daily XP count from the xpsummary_query_json variable (which updates with live data every 15 mins)
         # We'll need this below, to calculate the total XP earned
@@ -484,18 +516,25 @@ def main(config):
 
         # Deduce which Duolingo icon should be displayed right now
 
+        print ("XP Today: " + str(duolingo_xptoday))
+
         if int(duolingo_xptoday) == 0 and hour_now >= 18:
             DUOLINGO_ICON = DUOLINGO_ICON_CRY
         elif int(duolingo_xptoday) == 0:
             DUOLINGO_ICON = DUOLINGO_ICON_SLEEPING
-        elif int(duolingo_xptoday) > 0 and int(duolingo_xptoday) <= 45 and int(xp_target) != 0:
+        elif int(duolingo_xptoday) > 0 and int(duolingo_xptoday) < 40 and int(xp_target) != 0:
             DUOLINGO_ICON = DUOLINGO_ICON_STANDING_POINT_LEFT
-        elif int(duolingo_xptoday) >=  46 and int(duolingo_xptoday) <= 45:
+        elif int(duolingo_xptoday) >=  40 and int(duolingo_xptoday) <= 60  and int(xp_target) != 0:
+            DUOLINGO_ICON = DUOLINGO_ICON_STANDING
+        elif int(duolingo_xptoday) >  60 and int(duolingo_xptoday) < 80  and int(xp_target) != 0:
             DUOLINGO_ICON = DUOLINGO_ICON_STANDING
         elif int(duolingo_xptoday) > 80 and int(duolingo_xptoday) < 100 and int(xp_target) != 0:
             DUOLINGO_ICON = DUOLINGO_ICON_STANDING
         elif int(duolingo_xptoday) > 80 and int(duolingo_xptoday) < 100 and int(xp_target) != 0:
             DUOLINGO_ICON = DUOLINGO_ICON_STANDING
+        else:
+        	print("Error: Could not select specific Duolingo icon, so reverting to the default standing icon.")
+        	DUOLINGO_ICON = DUOLINGO_ICON_STANDING
 
         # Setup nickname display, if needed
         if display_nickname_toggle == True:
@@ -521,15 +560,15 @@ def main(config):
         display_output = render.Box(
             render.Row(
                 expanded = True,
-                main_align = "center",
-                cross_align = "center",
+                main_align = "space_evenly",
+                cross_align = "space_evenly",
                 children = [
                     render.Image(src = DUOLINGO_ICON_CRY),
 
                     # Column to hold pricing text evenly distrubuted accross 1-3 rows
                     render.Column(
                         main_align = "space_evenly",
-                        expanded = True,
+                        expanded = False,
                         children = [
                             render.Text("ERROR:", font = "CG-pixel-3x5-mono", color = "#FF0000"),
                             render.Text("%s" % error_message_1, font = "tom-thumb"),
@@ -662,12 +701,23 @@ def main(config):
 
         # Setup verticle bar dimensions
         vertbar_total_width = 5
-        vertbar_total_height = 23
 
-        # Put the XP scores for the week into a list called week_xp_scores. The first entry will be  days ago. The last entry will be today.
+        print("Display Extra Stats: " + str(display_extra_stats))
+
+        if display_extra_stats == True:
+        	vertbar_total_height = 16
+        else:
+        	vertbar_total_height = 24
+
+
+        # Put the XP scores for the week into a list called week_xp_scores. The first entry will be  days 13 ago. The last entry will be today.
         week_xp_scores = []
-        for daynum in range(0,len(duolingo_xpsummary_json["summaries"])):
-            day_xp = int(duolingo_xpsummary_json["summaries"][daynum]["gainedXp"])
+        for daynum in range(0,14):
+            day_xp = duolingo_xpsummary_json["summaries"][daynum]["gainedXp"]
+            if day_xp == None:
+                day_xp = int(0) 
+            else:
+                day_xp = int(day_xp)
             week_xp_scores.append(day_xp)
 
         print( "Two Week's XP Scores: " + str(week_xp_scores))
@@ -678,8 +728,8 @@ def main(config):
             print( "One Week's XP Scores: " + str(week_xp_scores))
 
         # Get the highest value from the available daily scores. This is used to setup the upper_chart_value.
-        week_xp_scores = sorted(week_xp_scores)
-        week_xp_highest = int(week_xp_scores[-1])
+        week_xp_scores_sorted = sorted(week_xp_scores)
+        week_xp_highest = int(week_xp_scores_sorted[-1])
 
         print( "Week's Highest XP Score: " + str(week_xp_highest))
 
@@ -699,8 +749,64 @@ def main(config):
 
             xp_day_score = duolingo_xpsummary_json["summaries"][daynum]["gainedXp"]
 
+            # Set this day's XP score to 0 if it is Null
+            if xp_day_score == None:
+                xp_day_score = 0
+
+            # Setup vertbar display variables for this day
+            if xp_day_score > 0:
+                    display_frozen = False
+                    display_missedday = False
+                    display_repaired = False
+            else:
+                is_frozen = bool(duolingo_xpsummary_json["summaries"][daynum]["frozen"])
+                is_repaired = bool(duolingo_xpsummary_json["summaries"][daynum]["repaired"])
+                is_streak_extended = bool(duolingo_xpsummary_json["summaries"][daynum]["streakExtended"])
+                if daynum != 0 and is_frozen == True:
+                    display_frozen = True
+                    display_missedday = False
+                    display_repaired = False
+                elif daynum != 0 and is_frozen == False and is_streak_extended == False and is_repaired == False:
+                    display_frozen = False
+                    display_missedday = True
+                    display_repaired = False
+                elif daynum != 0 and is_frozen == False and is_streak_extended == False and is_repaired == True:
+                    display_frozen = False
+                    display_missedday = False
+                    display_repaired = True
+
+
+
             if display_view == "twoweeks":
-               xp_day_score_lastweek = duolingo_xpsummary_json["summaries"][daynum + 7]["gainedXp"]
+                xp_day_score_lastweek = duolingo_xpsummary_json["summaries"][daynum + 7]["gainedXp"]
+
+
+	            # Setup this day last week's XP score to 0 if it is Null
+#	        	if xp_day_score_lastweek == None:
+#	                xp_day_score_lastweek = 0
+#
+	            # Setup vertbar display variables for this day last week
+#	            if xp_day_score_lastweek > 0:
+#	                    display_frozen_lastweek = False
+#	                    display_missedday_lastweek = False
+#	                    display_repaired_lastweek = False
+#	            else:
+#	                is_frozen_lastweek = bool(duolingo_xpsummary_json["summaries"][daynum + 7]["frozen"])
+#	                is_repaired_lastweek = bool(duolingo_xpsummary_json["summaries"][daynum + 7]["repaired"])
+#	                is_streak_extended_lastweek = bool(duolingo_xpsummary_json["summaries"][daynum + 7]["streakExtended"])
+#	                if daynum != 0 and is_frozen == True:
+#	                    display_frozen_lastweek = True
+#	                    display_missedday_lastweek = False
+#	                    display_repaired_lastweek = False
+#	                elif daynum != 0 and is_frozen == False and is_streak_extended == False and is_repaired == False:
+#	                    display_frozen_lastweek = False
+#	                    display_missedday_lastweek = True
+#	                    display_repaired_lastweek = False
+#	                elif daynum != 0 and is_frozen == False and is_streak_extended == False and is_repaired == True:
+#	                    display_frozen_lastweek = False
+#	                    display_missedday_lastweek = False
+#	                    display_repaired_lastweek = True
+
 
             # Display different shade of color bar if the XP score was not hit
             if int(xp_day_score) >= int(xp_target):
@@ -728,15 +834,8 @@ def main(config):
             else:
                 vertbar_lastweek_height = 0
 
-
+            # Display normal one week proress bar
             oneweek_bar = [
-                
-                # Spacer bar
-                render.Box( # spacer column
-                    width=1, 
-                    height=(vertbar_total_height), 
-                    color="#000000",
-                ),
 
                 # This week full size  bar
                 render.Box(
@@ -760,12 +859,34 @@ def main(config):
                         ),
                         pad=(0, (vertbar_total_height - vertbar_current_height), 0, 0),                 
                     ),
-                )
+                ),
+
+                # Spacer bar
+                render.Box( # spacer column
+                    width=1, 
+                    height=(vertbar_total_height), 
+                    color="#000000",
+                ),
 
             ]
 
-            
-            twoweeks_bar = [
+            oneweek_bar_frozen = [
+
+                # This week full size  bar
+                render.Box(
+                    width=vertbar_total_width, 
+                    height=vertbar_total_height, 
+                    color="#000000",
+                    child = render.Padding(
+                        child = render.Box(
+                            width=5, 
+                            height=vertbar_current_height, 
+                            color=str(vertbar_col),
+                            child = render.Image(src = STREAK_ICON_FROZEN),             
+                        ),
+                        pad=(0, (vertbar_total_height - vertbar_current_height), 0, 0),                 
+                    ),
+                ),
                 
                 # Spacer bar
                 render.Box( # spacer column
@@ -773,6 +894,11 @@ def main(config):
                     height=(vertbar_total_height), 
                     color="#000000",
                 ),
+
+            ]
+
+            
+            twoweeks_bar = [
 
                 # Last week narrow bar
                 render.Box(
@@ -821,8 +947,36 @@ def main(config):
                             pad=(0, (vertbar_total_height - vertbar_current_height), 0, 0),                 
                         ),
                     ),
-                )
+                ),
+                
+                # Spacer bar
+                render.Box( # spacer column
+                    width=1, 
+                    height=(vertbar_total_height), 
+                    color="#000000",
+                ),
             ]
+
+
+            # TESTING VARIABLES
+
+
+            # Choose what to display - bar, frozen icon, missed, blank or flashing progress (used for today)
+            if display_view == "week":
+            	if display_frozen == True:
+            		oneweek_bar = oneweek_bar_frozen  						# display the frozen icon
+ #           	elif display_missed == True:
+ #           		oneweek_bar = one_week_bar_missed						# display the missed day cross icon
+ #           	elif display_repaired == True:
+ #           		oneweek_bar = one_week_bar_repaired						# display the band aid icon
+ #           	elif daynum == 0 and xp_day_score == 0:
+ #           		oneweek_bar = one_week_bar_today_flashing_start			# display the flashing progress indicator
+ #           	elif daynum == 0 and xp_day_score > 0:
+ #           		oneweek_bar = one_week_bar_today_flashing_progress		# display the flashing progress indicator
+ #           	elif daynum != 0 and xp_day_score > 0:
+ #           		oneweek_bar = one_week_bar_today_flashing_progress		# display the flashing progress indicator
+            	else:
+            		oneweek_bar = oneweek_bar								# display the normal progress indicator
 
             # Choose which display to show
             if display_view == "week":
@@ -841,35 +995,44 @@ def main(config):
             streak_icon_day_frozen = bool(duolingo_xpsummary_json["summaries"][daynum]["frozen"])
             streak_icon_day_extended = bool(duolingo_xpsummary_json["summaries"][daynum]["streakExtended"])
 
-            if streak_icon_day_extended == True:
-                streak_icon = STREAK_ICON_GOLD
-            elif streak_icon_day_frozen == True:
-                streak_icon = STREAK_ICON_FROZEN
-            else:
-                streak_icon = STREAK_ICON_GREY
+#            if streak_icon_day_extended == True:
+#                streak_icon = STREAK_ICON_GOLD
+#            elif streak_icon_day_frozen == True:
+#                streak_icon = STREAK_ICON_FROZEN
+#            else:
+#                streak_icon = STREAK_ICON_GREY
 
 
-            # Get day of week:
+            # Calculate cache countdown
+ #           cache_countdown = xp_query_time - now
+ #           print("Cache Countdown: " + cache_countdown)
+
+
+
+            # Get day of week, based on when the xp summary data was last updated:
             if daynum == 0: # TODAY
-                dayofweek = now
+                dayofweek = xp_query_time
             elif daynum == 1: # YESTERDAY
-                dayofweek = now - time.parse_duration("24h")
+                dayofweek = xp_query_time - time.parse_duration("24h")
             elif daynum == 2: # TWO DAYS AGO
-                dayofweek = now - time.parse_duration("48h")
+                dayofweek = xp_query_time - time.parse_duration("48h")
             elif daynum == 3: # THREE DAYS AGO
-                dayofweek = now - time.parse_duration("72h")
+                dayofweek = xp_query_time - time.parse_duration("72h")
             elif daynum == 4: # FOUR DAYS AGO
-                dayofweek = now - time.parse_duration("96h")
+                dayofweek = xp_query_time - time.parse_duration("96h")
             elif daynum == 5: # FIVE DAYS AGO
-                dayofweek = now - time.parse_duration("120h")
+                dayofweek = xp_query_time - time.parse_duration("120h")
             elif daynum == 6: # SIX DAYS AGO
-                dayofweek = now - time.parse_duration("144h")
+                dayofweek = xp_query_time - time.parse_duration("144h")
 
 
             # Convert day of week to single lower case letter
             dayofweek_letter = dayofweek.format("Mon").lower()[0]
 
-            print( "Day of Week: " + str(dayofweek_letter) + "  XP Score: " + str(xp_day_score))
+            if display_view == "week":
+            	print( "Day of Week: " + str(dayofweek_letter) + "  XP Score: " + str(xp_day_score))
+            elif display_view == "twoweeks":
+            	print( "Day of Week: " + str(dayofweek_letter) + "  Last Week XP Score: " + str(xp_day_score_lastweek)+ "   This Week XP Score: " + str(xp_day_score))
 
 
             # Get current day of week
@@ -881,7 +1044,7 @@ def main(config):
 
 
             day_progress_chart = render.Column(
-                main_align = "center",
+                main_align = "end",
                 cross_align = "center", # Controls vertical alignment
                 expanded = True,
                 children = [
@@ -892,10 +1055,14 @@ def main(config):
                         expanded = False,
                         children = [
                             render.Box(
-                                width=2, 
+                                width=1, 
                                 height=7, 
                             ),
                             render.Text(str(dayofweek_letter), font = "tom-thumb"),
+                            render.Box(
+                                width=1, 
+                                height=7, 
+                            ),
                         ],
                     ),
                     
@@ -905,8 +1072,6 @@ def main(config):
 
             week_progress_chart.append(day_progress_chart)
 
-
-        print ("Week Progress Chart: " + str(week_progress_chart))
 
 
         display_output = render.Box(
@@ -928,15 +1093,15 @@ def main(config):
 
                             render.Row(
                                 main_align = "space_evenly",
-                                cross_align = "end", # Controls vertical alignment
+                                cross_align = "space_evenly", # Controls vertical alignment
                                 expanded = False,
                                 children = [
-                                    render.Image(src = DUOLINGO_ICON_STANDING),
+                                    render.Image(src = DUOLINGO_ICON),
                                 ],
                             ),
                             render.Box(
-                                width=21, 
-                                height=2, 
+                                width=22, 
+                                height=1, 
                                 color="#000000",
                             ),                            
                             nickname_today_view
