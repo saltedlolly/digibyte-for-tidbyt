@@ -150,8 +150,8 @@ def get_schema():
         ),
         schema.Toggle(
             id = "extra_week_stats",
-            name = "Extra Week Stats?",
-            desc = "Toggle displaying the current Streak and total XP above the Week view chart.",
+            name = "Extra Chart Stats?",
+            desc = "Toggle to display the current Streak and total XP for the one/two weeks.",
             icon = "toggle-on",
             default = DEFAULT_SHOW_EXTRA_STATS,
         ),
@@ -703,6 +703,7 @@ def main(config):
             vertbar_total_height = 24
 
 
+
         # Put the XP scores for the week into a list called week_xp_scores. The first entry will be  days 13 ago. The last entry will be today.
         week_xp_scores = []
         for daynum in range(0,14):
@@ -719,6 +720,18 @@ def main(config):
         if display_view == "week":
             week_xp_scores = (week_xp_scores[0:7])
             print( "One Week's XP Scores: " + str(week_xp_scores))
+
+
+        # Add up the XP score from every day to get the one week or two week total
+        week_xp_scores_total = 0
+        if display_view == "week":
+            # Add up total xp score for the last week
+            for i in range(0,7):
+                week_xp_scores_total = week_xp_scores[i] + week_xp_scores_total
+        if display_view == "twoweeks":
+            # Add up total xp score for the last week
+            for i in range(0,14):
+                week_xp_scores_total = week_xp_scores[i] + week_xp_scores_total
 
         # Get the highest value from the available daily scores. This is used to setup the upper_chart_value.
         week_xp_scores_sorted = sorted(week_xp_scores)
@@ -748,25 +761,38 @@ def main(config):
 
             # Setup vertbar display variables for this day
             if xp_day_score > 0:
-                    display_frozen = False
-                    display_missed = False
-                    display_repaired = False
+                    display_frozen_thisweek = False
+                    display_missed_thisweek = False
+                    display_repaired_thisweek = False
             else:
-                is_frozen = bool(duolingo_xpsummary_json["summaries"][daynum]["frozen"])
-                is_repaired = bool(duolingo_xpsummary_json["summaries"][daynum]["repaired"])
-                is_streak_extended = bool(duolingo_xpsummary_json["summaries"][daynum]["streakExtended"])
-                if daynum != 0 and is_frozen == True:
-                    display_frozen = True
-                    display_missed = False
-                    display_repaired = False
-                elif daynum != 0 and is_frozen == False and is_streak_extended == False and is_repaired == False:
-                    display_frozen = False
-                    display_missed = True
-                    display_repaired = False
-                elif daynum != 0 and is_frozen == False and is_streak_extended == False and is_repaired == True:
-                    display_frozen = False
-                    display_missed = False
-                    display_repaired = True
+                is_frozen_thisweek = bool(duolingo_xpsummary_json["summaries"][daynum]["frozen"])
+                is_repaired_thisweek = bool(duolingo_xpsummary_json["summaries"][daynum]["repaired"])
+                is_streak_extended_thisweek = bool(duolingo_xpsummary_json["summaries"][daynum]["streakExtended"])
+                if daynum != 0 and is_frozen_thisweek == True:
+                    display_frozen_thisweek = True
+                    display_missed_thisweek = False
+                    display_repaired_thisweek = False
+                elif daynum != 0 and is_frozen_thisweek == False and is_streak_extended_thisweek == False and is_repaired_thisweek == False:
+                    display_frozen_thisweek = False
+                    display_missed_thisweek = True
+                    display_repaired_thisweek = False
+                elif daynum != 0 and is_frozen_thisweek == False and is_streak_extended_thisweek == False and is_repaired_thisweek == True:
+                    display_frozen_thisweek = False
+                    display_missed_thisweek = False
+                    display_repaired_thisweek = True
+
+            # Display different shade of color bar if the XP score was not hit
+            if int(xp_day_score) >= int(xp_target):
+                vertbar_col = "#feea3a"
+                vertbar_col_header = "#ea3afe"
+            else:
+                vertbar_col = "#9e9e9e"
+                vertbar_col_header = "#e1e0e0"         
+
+            vertbar_thisweek_col_frozen = "#71d2ff"
+            vertbar_thisweek_col_missed = "#ff0000"
+            vertbar_thisweek_col_repaired = "#e1e0e0"
+
 
             if display_view == "twoweeks":
                 xp_day_score_lastweek = duolingo_xpsummary_json["summaries"][daynum + 7]["gainedXp"]
@@ -784,41 +810,41 @@ def main(config):
                     is_frozen_lastweek = bool(duolingo_xpsummary_json["summaries"][daynum + 7]["frozen"])
                     is_repaired_lastweek = bool(duolingo_xpsummary_json["summaries"][daynum + 7]["repaired"])
                     is_streak_extended_lastweek = bool(duolingo_xpsummary_json["summaries"][daynum + 7]["streakExtended"])
-                    if daynum != 0 and is_frozen == True:
+                    if daynum != 0 and is_frozen_lastweek == True:
                         display_frozen_lastweek = True
                         display_missed_lastweek = False
                         display_repaired_lastweek = False
-                    elif daynum != 0 and is_frozen == False and is_streak_extended == False and is_repaired == False:
+                    elif daynum != 0 and is_frozen_lastweek == False and is_streak_extended_lastweek == False and is_repaired_lastweek == False:
                         display_frozen_lastweek = False
                         display_missed_lastweek = True
                         display_repaired_lastweek = False
-                    elif daynum != 0 and is_frozen == False and is_streak_extended == False and is_repaired == True:
+                    elif daynum != 0 and is_frozen_lastweek == False and is_streak_extended_lastweek == False and is_repaired_lastweek == True:
                         display_frozen_lastweek = False
                         display_missed_lastweek = False
                         display_repaired_lastweek = True
 
+                # Work out the diferent shades of color bar if the XP score was not hit
+                if int(xp_day_score_lastweek) >= int(xp_target):
+                    vertbar_lastweek_col = "#9e8e01"
+                    vertbar_lastweek_col_header = "#770185"
+                else:
+                    vertbar_lastweek_col = "#3a3a3a"
+                    vertbar_lastweek_col_header = "#616161"
 
-            # Display different shade of color bar if the XP score was not hit
-            if int(xp_day_score) >= int(xp_target):
-                vertbar_col = "#feea3a"
-                vertbar_col_header = "#ea3afe"
-            else:
-                vertbar_col = "#9e9e9e"
-                vertbar_col_header = "#e1e0e0"
+                vertbar_lastweek_col_frozen = "#76d1fb"
+                vertbar_lastweek_col_missed = "#ff0000"
+                vertbar_lastweek_col_repaired = "#e1e0e0"
 
-            # Same again but for last weeks color bars
-            if int(xp_day_score_lastweek) >= int(xp_target):
-                vertbar_lastweek_col = "#feea3a"
-                vertbar_lastweek_col_header = "#ea3afe"
-            else:
-                vertbar_lastweek_col = "#3a3a3a"
-                vertbar_lastweek_col_header = "#e1e0e0"
 
-            # Calculate this week vertical bar length
+            # Calculate this week vertical bar height
             # First, work out percentage progress towards the upper_chart_value
             vertbar_current_perc = (int(xp_day_score) / int(upper_chart_value)) * 100
             # Second, work out the current height the vertical bar should be
             vertbar_current_height = int((vertbar_total_height / 100) * vertbar_current_perc)
+
+            # Ensure the bar has at least one pixel height if a lesson has been completed (to prevent it showing as zero when other lessons have very high scores)
+            if vertbar_current_height == 0 and int(xp_day_score) > 0:
+                vertbar_current_height = 1
 
             # Calculate last weeks vertical bar length, if it is being displayed
             if display_view == "twoweeks":
@@ -826,6 +852,12 @@ def main(config):
                 vertbar_lastweek_perc = (int(xp_day_score_lastweek) / int(upper_chart_value)) * 100
                 # Second, work out the current height the vertical bar should be
                 vertbar_lastweek_height = int((vertbar_total_height / 100) * vertbar_lastweek_perc)
+
+                # Ensure the bar has at least one pixel height if a lesson has been completed (to prevent it showing as zero when other lessons have very high scores)
+                if vertbar_lastweek_height == 0 and int(xp_day_score) > 0:
+                    vertbar_lastweek_height = 1
+
+
             else:
                 vertbar_lastweek_height = 0
 
@@ -955,53 +987,98 @@ def main(config):
 
             ]
 
-            twoweeks_bar_thisweek_normal = render.Box(
-                width=3, 
-                height=(vertbar_total_height), 
-                color="#e1e0e0",
-                child = render.Box(
+            # Set up two weeks bars
+            if display_view == "twoweeks":
+
+                twoweeks_bar_thisweek_normal = render.Box(
+                    width=3, 
+                    height=(vertbar_total_height), 
+                    color="#e1e0e0",
+                    child = render.Box(
+                        width=3, 
+                        height=vertbar_total_height, 
+                        color="#000000",
+                        child = render.Padding(
+                            child = render.Box(
+                                width=3, 
+                                height=vertbar_current_height, 
+                                color=str(vertbar_col),
+
+                                child = render.Padding(
+                                    child = render.Box(
+                                        width=3, 
+                                        height=1, 
+                                        color=str(vertbar_col_header),
+                                    ),
+                                    pad=(0, 0, 0, vertbar_current_height - 1),                 
+                                ),
+
+                            ),
+                            pad=(0, (vertbar_total_height - vertbar_current_height), 0, 0),                 
+                        ),
+                    ),
+                )
+
+                twoweeks_bar_lastweek_normal = render.Box(
+                    width=2, 
+                    height=(vertbar_total_height), 
+                    color="#e1e0e0",
+                    child = render.Box(
+                        width=2, 
+                        height=vertbar_total_height, 
+                        color="#000000",
+                        child = render.Padding(
+                            child = render.Box(
+                                width=2, 
+                                height=vertbar_lastweek_height, 
+                                color=str(vertbar_lastweek_col),
+
+                                child = render.Padding(
+                                    child = render.Box(
+                                        width=2, 
+                                        height=1, 
+                                        color=str(vertbar_lastweek_col_header),
+                                    ),
+                                    pad=(0, 0, 0, vertbar_lastweek_height - 1),                 
+                                ),
+
+                            ),
+                            pad=(0, (vertbar_total_height - vertbar_lastweek_height), 0, 0),                 
+                        ),
+                    ),
+                )
+
+
+                # Display this week frozen on two week chart
+                twoweeks_bar_thisweek_frozen = render.Box(
                     width=3, 
                     height=vertbar_total_height, 
                     color="#000000",
                     child = render.Padding(
                         child = render.Box(
                             width=3, 
-                            height=vertbar_current_height, 
-                            color=str(vertbar_col),
-
-                            child = render.Padding(
-                                child = render.Box(
-                                    width=3, 
-                                    height=1, 
-                                    color=str(vertbar_col_header),
-                                ),
-                                pad=(0, 0, 0, vertbar_current_height - 1),                 
-                            ),
-
+                            height=1, 
+                            color=vertbar_thisweek_col_frozen,
                         ),
-                        pad=(0, (vertbar_total_height - vertbar_current_height), 0, 0),                 
+                        pad=(0, (vertbar_total_height - 1), 0, 0),                 
                     ),
-                ),
-            )
+                )
 
-            twoweeks_bar_lastweek_normal = render.Box(
-                width=2, 
-                height=(vertbar_total_height), 
-                color="#e1e0e0",
-                child = render.Box(
-                    width=2, 
+
+                # Display last week frozen on two week chart
+                twoweeks_bar_lastweek_frozen = render.Box(
+                    width=3, 
                     height=vertbar_total_height, 
                     color="#000000",
                     child = render.Padding(
                         child = render.Box(
                             width=2, 
-                            height=vertbar_lastweek_height, 
-                            color=str(vertbar_lastweek_col),
+                            height=1, 
+                            color=vertbar_lastweek_col_frozen,
                         ),
-                        pad=(0, (vertbar_total_height - vertbar_lastweek_height), 0, 0),                 
+                        pad=(0, (vertbar_total_height - 1), 0, 0),                 
                     ),
-                ),
-            )
+                )
 
             
 
@@ -1015,11 +1092,11 @@ def main(config):
 
             # Choose what to display - bar, frozen icon, missed, blank or flashing progress (used for today)
             if display_view == "week":
-                if display_frozen == True:
+                if display_frozen_thisweek == True:
                     oneweek_bar = oneweek_bar_frozen                        # display the frozen icon
-                elif display_missed == True:
+                elif display_missed_thisweek == True:
                     oneweek_bar = oneweek_bar_missed                        # display the missed day cross icon
-                elif display_repaired == True:
+                elif display_repaired_thisweek == True:
                     oneweek_bar = oneweek_bar_repaired                      # display the band aid icon
  #              elif daynum == 0 and xp_day_score == 0:
  #                  oneweek_bar = oneweek_bar_today_flashing_start          # display the flashing progress indicator
@@ -1031,34 +1108,42 @@ def main(config):
                     oneweek_bar = oneweek_bar_normal                               # display the normal progress indicator
 
             if display_view == "twoweeks":
- #               if display_frozen_lastweek == True:
- #                   twoweeks_bar_lastweek = twoweeks_bar_lastweek_frozen                        # display the frozen icon
- #                   twoweeks_bar_thisweek = twoweeks_bar_thisweek_frozen                        # display the frozen icon
+
+                # last week
+                if display_frozen_lastweek == True:
+                    twoweeks_bar_lastweek = twoweeks_bar_lastweek_frozen                        # display the frozen icon
  #               elif display_missed_lastweek == True:
  #                   twoweeks_bar_lastweek = twoweeks_bar_lastweek_missed                        # display the missed day cross icon
- #                   twoweeks_bar_thisweek = twoweeks_bar_thisweek_missed                        # display the missed day cross icon
  #               elif display_repaired_lastweek == True:
  #                   twoweeks_bar_lastweek = twoweeks_bar_lastweek_repaired                      # display the band aid icon
+                else:
+                    twoweeks_bar_lastweek = twoweeks_bar_lastweek_normal            # display the normal progress indicator
+
+                # this week
+                if display_frozen_thisweek == True:
+                    twoweeks_bar_thisweek = twoweeks_bar_thisweek_frozen                        # display the frozen icon
+ #               elif display_missed_thisweek == True:
+ #                   twoweeks_bar_thisweek = twoweeks_bar_thisweek_missed                        # display the missed day cross icon
+ #               elif display_repaired_thisweek == True:
  #                   twoweeks_bar_thisweek = twoweeks_bar_thisweek_repaired                      # display the band aid icon
- #               else:
-                    twoweeks_bar_lastweek = twoweeks_bar_lastweek_normal    # display the normal progress indicator
-                    twoweeks_bar_thisweek = twoweeks_bar_thisweek_normal
+                else:
+                    twoweeks_bar_thisweek = twoweeks_bar_thisweek_normal                # display the normal progress indicator
 
-            twoweeks_bar = [
+                twoweeks_bar = [
 
-                # Last week narrow bar
-                twoweeks_bar_lastweek,
+                    # Last week narrow bar
+                    twoweeks_bar_lastweek,
 
-                # This week wide bar
-                twoweeks_bar_thisweek,
-                
-                # Spacer bar
-                render.Box( # spacer column
-                    width=1, 
-                    height=(vertbar_total_height), 
-                    color="#000000",
-                ),
-            ]
+                    # This week wide bar
+                    twoweeks_bar_thisweek,
+                    
+                    # Spacer bar
+                    render.Box( # spacer column
+                        width=1, 
+                        height=(vertbar_total_height), 
+                        color="#000000",
+                    ),
+                ]
 
 
             # Choose which display to show
@@ -1156,58 +1241,117 @@ def main(config):
             week_progress_chart.append(day_progress_chart)
 
 
+        if display_extra_stats == True:
 
-        display_output = render.Box(
-
-
-
-            render.Row(
+            display_stats_header = render.Row(
                 expanded = True,
                 main_align = "space_evenly",
-                cross_align = "center",
-                children = [
+                cross_align = "end",
+                children =  [
 
-                    # Display Duolingo icon and username
+                    # Display current Streak
                     render.Column(
                         main_align = "center",
                         cross_align = "center", # Controls vertical alignment
-                        expanded = True,
+                        expanded = False,
                         children = [
-
                             render.Row(
                                 main_align = "space_evenly",
-                                cross_align = "space_evenly", # Controls vertical alignment
+                                cross_align = "end", # Controls vertical alignment
                                 expanded = False,
                                 children = [
-                                    render.Image(src = DUOLINGO_ICON),
+                                    render.Image(src = streak_icon),
+                                    render.Box( # spacer column
+                                        width=1, 
+                                        height=1, 
+                                        color="#000000",
+                                    ),
+                                    render.Text(str(duolingo_streak_now), font = "tom-thumb"),
                                 ],
                             ),
-                            render.Box(
-                                width=22, 
-                                height=1, 
-                                color="#000000",
-                            ),                            
-                            nickname_today_view
                         ],
                     ),
 
-                    # Display Progress Chart
+                    # Display total XP
                     render.Column(
-                        main_align = "space_evenly",
+                        main_align = "end",
                         cross_align = "center", # Controls vertical alignment
-                        expanded = True,
+                        expanded = False,
+                        children = [
+                            render.Row(
+                                main_align = "space_evenly",
+                                cross_align = "end", # Controls vertical alignment
+                                expanded = False,
+                                children = [
+                                    render.Image(src = XP_ICON),
+                                    render.Text(str(week_xp_scores_total), font = "tom-thumb"),
+                                ],
+                            ),
+                        ],
+                    ),
+                            
+                ],
+            )
+
+        else:
+            display_stats_header = None
+
+
+        display_output = render.Box(
+
+            render.Column(
+
+                children = [
+                    display_stats_header,
+                    render.Row(
+                        expanded = False,
+                        main_align = "space_evenly",
+                        cross_align = "center",
                         children = [
 
-                            # Display week progress chart
-                            render.Row(
-                                main_align = "end",
-                                cross_align = "end",
+                            # Display Duolingo icon and username
+                            render.Column(
+                                main_align = "center",
+                                cross_align = "center", # Controls vertical alignment
                                 expanded = True,
-                                children = week_progress_chart,
-                            ),                                                    
+                                children = [
+
+                                    render.Row(
+                                        main_align = "space_evenly",
+                                        cross_align = "space_evenly", # Controls vertical alignment
+                                        expanded = False,
+                                        children = [
+                                            render.Image(src = DUOLINGO_ICON),
+                                        ],
+                                    ),
+                                    render.Box(
+                                        width=22, 
+                                        height=1, 
+                                        color="#000000",
+                                    ),                            
+                                    nickname_today_view
+                                ],
+                            ),
+
+                            # Display Progress Chart
+                            render.Column(
+                                main_align = "end",
+                                cross_align = "center", # Controls vertical alignment
+                                expanded = True,
+                                children = [
+
+                                    # Display week progress chart
+                                    render.Row(
+                                        main_align = "end",
+                                        cross_align = "end",
+                                        expanded = True,
+                                        children = week_progress_chart,
+                                    ),                                                    
+                                ],
+                            ),
+
                         ],
                     ),
-
                 ],
             ),
         )
