@@ -190,7 +190,7 @@ def main(config):
     # Get Schema variables
     duolingo_username = config.get("duolingo_username", DEFAULT_USERNAME)
     display_view = DISPLAY_VIEW_LIST.get(config.get("display_view"), DEFAULT_DISPLAY_VIEW)
-    xp_target = XP_TARGET_LIST.get("xp_target", DEFAULT_DAILY_XP_TARGET)
+    xp_target = int(config.str("xp_target", "DEFAULT_DAILY_XP_TARGET"))
     nickname = config.get("nickname", DEFAULT_NICKNAME)
     display_extra_stats = config.get("extra_week_stats", DEFAULT_SHOW_EXTRA_STATS)
 
