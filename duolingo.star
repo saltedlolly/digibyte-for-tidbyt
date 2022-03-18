@@ -3,7 +3,7 @@ Applet: Duolingo
 Summary: Track language study progress
 Description: Display Duolingo stats and track your progress towards a daily XP target.
 Author: Olly Stedall @saltedlolly
-Thanks: @drudge
+Thanks: @drudge @whyamIhere @AmillionAir
 """
 
 ################################################################################
@@ -23,12 +23,11 @@ load("time.star", "time")
 
 # Set applet defaults
 DEFAULT_USERNAME = "saltedlolly"
-DEFAULT_DAILY_XP_TARGET = "100"       # Choose the desired daily XP goal. The XP goal set in the Duolingo app is ignored.
+DEFAULT_DAILY_XP_TARGET = "100"         # Choose the desired daily XP goal. The XP goal set in the Duolingo app is ignored.
 DEFAULT_TIMEZONE = "Europe/London"    # Affects when the daily XP counter resets.
 DEFAULT_DISPLAY_VIEW = "today"        # can be 'today', 'week' or 'twoweeks'
-DEFAULT_NICKNAME = "Olly"             # Max five characters. Displays on screen to identify the Duolingo user.
-DEFAULT_SHOW_NICKNAME = False         # Choose whther to display the nickname on screen.
-DEFAULT_SHOW_EXTRA_STATS = "totalxp"       # Display currennt Streak and total XP score on the week chart. Can be 'none', 'chartxp' or 'totalxp'
+DEFAULT_NICKNAME = ""                 # Max five characters. Displays on screen to identify the Duolingo user.
+DEFAULT_SHOW_EXTRA_STATS = "totalxp"  # Display currennt Streak and total XP score on the week chart. Can be 'none', 'chartxp' or 'totalxp'
 
 
 # 16 x 18
@@ -66,8 +65,13 @@ iVBORw0KGgoAAAANSUhEUgAAAAYAAAAICAYAAADaxo44AAAACXBIWXMAAAsTAAALEwEAmpwYAAAGeWlU
 """)
 
 # Streak Flame Icon - Gold Animated 6x7
-STREAK_ICON_GOLD_ANIMATED = base64.decode("""
+STREAK_ICON_GOLD_ANIMATED_OLD = base64.decode("""
 UklGRlQDAABXRUJQVlA4WAoAAAASAAAABQAABwAAQU5JTQYAAAD/////AABBTk1GcAAAAAAAAAAAAAUAAAcAAGQAAAJWUDhMWAAAAC8FwAEAb6CQkSSp1p9qIZ47mtEgkLRx/Tv/Ctu2QdLR///i/AfslQBSkMD7moMn5DKeACW1tWZP4QhBDJoQgwhEmJ6em1yOP7tmEf0PgAYLTCpGen/zsxVBTk1GWgAAAAAAAAEAAAUAAAQAAGQAAABWUDhMQgAAAC8FAAEQV0CQbVN/q2OcZhoEkjauf+dfYds2SDr6/1+c/wBwK0igd43nQAIoaiSFOXpRyhMJ2MB5RP8DpDBe+YtBNkFOTUYqAAAAAQAAAQAAAAAAAAAAZAAAAFZQOEwRAAAALwAAAAAHUOD696D/gYjofwAAQU5NRkoAAAABAAAAAAADAAAFAABkAAAAVlA4TDEAAAAvA0ABECcgEEjyp1pjMwFJYv8/h5AgIfn/r2X+A7CzCRiIJDO5jwCiiCCi/8FWzPEAAEFOTUZIAAAAAQAAAAAAAwAABQAAZAAAAFZQOEwwAAAALwNAARAnIBBI8qdaY7P5V9O2AdPNn26/+Q8A7Eg7GGQbOdi7F3iUR/iI/gef0eUAQU5NRl4AAAAAAAAAAAAFAAAGAABkAAAAVlA4TEYAAAAvBYABEE9AkG2z+VPd4jbTEJAk9v9zKGzbBsnw/3t5/gMAdwokrgR6BAioiSQpmvuPGGMnBwEIIMN6RP8DYAMyuibu+4csQU5NRmAAAAAAAAAAAAAFAAAGAABkAAAAVlA4TEcAAAAvBYABEFdAkG1Tf6tjnGYaBJI2rn/nX2HbNkg6+v9fnP8AcCtIoHeN50ACKKptmzrvj5FWqhiKQAzNI/ofAA/EZ+ixf9emDQBBTk1GWgAAAAAAAAEAAAUAAAQAAGQAAABWUDhMQgAAAC8FAAEQV0CQbVN/q2OcZhoEkjauf+dfYds2SDr6/1+c/wBwK0igd43nQAIoaiSFOXpRiQdE8EV+RP8DSmD72slDJ0FOTUZKAAAAAAAAAAAABAAABQAAZAAAAFZQOEwxAAAALwRAARAnIBBI8qdaYzMBSWL/P4eQICH5/69l/gOwswkYiCQzuY8Ekoggov8BC2fgAQBSSUZGZAAAAFdFQlBWUDhMWAAAAC8FwAEAb6CQkSSp1p9qIZ47mtEgkLRx/Tv/Ctu2QdLR///i/AfslQBSkMD7moMn5DKeACW1tWZP4QhBDJoQgwhEmJ6em1yOP7tmEf0PgAYLTCpGen/zsxU=
+""")
+
+# Streak Flame Icon - Gold Animated 5x7
+STREAK_ICON_GOLD_ANIMATED = base64.decode("""
+UklGRmYDAABXRUJQVlA4WAoAAAASAAAABAAABgAAQU5JTQYAAAD/////AABBTk1GbgAAAAAAAAAAAAQAAAYAAGQAAAJWUDhMVgAAAC8EgAEAb6CQkSSp1p9qIZ47mtEgkLRx/Tv/Ctu2QdLR///i/AfslQBSkMD7moMn5DKeAEWRJDXzvUCQggmMoAYH6YsOPCAAYRH9D4Ri5EavOo7cHd4HQU5NRmIAAAAAAAAAAAAEAAAFAABkAAAAVlA4TEoAAAAvBEABEFdAkG1Tf6tjnGYaBJI2rn/nX2HbNkg6+v9fnP8AcCtIoHeN50ACqIkkRZqIJ0MCLkiRgBxCJJyEkx3R/wCimaSe78l9AEFOTUYsAAAAAAAAAAAAAQAAAQAAZAAAAFZQOEwTAAAALwFAABAPMMDjPwfzH/AYgYj+hwBBTk1GSgAAAAAAAAAAAAQAAAQAAGQAAABWUDhMMQAAAC8EAAEQJyAQSPKnWmMzAUli/z+HkCAh+f+vZf4DsLMJGIgkM7mPACpoIqL/4SyvYQAAQU5NRkgAAAAAAAAAAAAEAAAEAABkAAAAVlA4TC8AAAAvBAABECcgEEjyp1pjs/lX07YB082fbr/5DwDsSDsYZBs52MspHMAjfET/wzwnUABBTk1GYAAAAAAAAAAAAAQAAAUAAGQAAABWUDhMSAAAAC8EQAEQT0CQbbP5U93iNtMQkCT2/3MobNsGyfD/e3n+AwB3CiSuBHoECCCJbEUPBZISeCJQAk8ELBHOXfyI/kcKOPHpsns6C0FOTUZkAAAAAAAAAAAABAAABQAAZAAAAFZQOExMAAAALwRAARBXQJBtU3+rY5xmGgSSNq5/519h2zZIOvr/X5z/AHArSKB3jedAAqiJbDX6FUeHBFzQYgE3lOQQEAmRHdH/MIElyhFP+9J8AEFOTUZgAAAAAAAAAAAABAAABQAAZAAAAFZQOExIAAAALwRAARBXQJBtU3+rY5xmGgSSNq5/519h2zZIOvr/X5z/AHArSKB3jedAApipbeNtjCKIIIIIoohg0sEmdkT/A0jDiwvZ1h8AQU5NRkgAAAAAAAAAAAADAAAEAABkAAAAVlA4TDAAAAAvAwABECcgEEjyp1pjMwFJYv8/h5AgIfn/r2X+A7CzCRhkGznXu3+QR/mI/seFeSxSSUZGYgAAAFdFQlBWUDhMVgAAAC8EgAEAb6CQkSSp1p9qIZ47mtEgkLRx/Tv/Ctu2QdLR///i/AfslQBSkMD7moMn5DKeAEWRJDXzvUCQggmMoAYH6YsOPCAAYRH9D4Ri5EavOo7cHd4H
 """)
 
 # Streak Flame Icon - Greyscale 6x7
@@ -108,11 +112,28 @@ DISPLAY_HEADER_LIST = {
     "Streak + Total XP": "totalxp",
 }
 
+XP_TARGET_LIST = {
+    "None": "0",
+    "20xp": "20",
+    "30xp": "30",
+    "50xp": "50",
+    "75xp": "75",
+    "100xp": "100",
+    "125xp": "125",
+    "150xp": "150",
+    "200xp": "200",
+}
+
 def get_schema():
 
     displayoptions = [
         schema.Option(display = displayv, value = displayv)
         for displayv in DISPLAY_VIEW_LIST
+    ]
+
+    xptargetoptions = [
+        schema.Option(display = xptargetkey, value = xptargetval)
+        for xptargetkey,xptargetval in XP_TARGET_LIST.items()
     ]
 
     headeroptions = [
@@ -138,12 +159,13 @@ def get_schema():
             default = displayoptions[0].value,
             options = displayoptions,
         ),
-        schema.Text(
+        schema.Dropdown(
             id = "xp_target",
             name = "Daily XP target",
-            desc = "Enter a daily XP goal. Resets at midnight.",
+            desc = "Enter a daily XP target. Resets at midnight.",
             icon = "trophy",
-            default = DEFAULT_DAILY_XP_TARGET,
+            default = xptargetoptions[3].value,
+            options = xptargetoptions,
         ),
         schema.Text(
             id = "nickname",
@@ -151,13 +173,6 @@ def get_schema():
             desc = "Display on Tidbyt to identify the user. Max 5 letters.",
             icon = "user",
             default = DEFAULT_NICKNAME,
-        ),
-        schema.Toggle(
-            id = "display_nickname_toggle",
-            name = "Display Nickname?",
-            desc = "Toggle displaying user nickname.",
-            icon = "toggle-on",
-            default = DEFAULT_SHOW_NICKNAME,
         ),
         schema.Dropdown(
             id = "extra_week_stats",
@@ -175,14 +190,15 @@ def main(config):
     # Get Schema variables
     duolingo_username = config.get("duolingo_username", DEFAULT_USERNAME)
     display_view = DISPLAY_VIEW_LIST.get(config.get("display_view"), DEFAULT_DISPLAY_VIEW)
-    xp_target = config.get("xp_target", DEFAULT_DAILY_XP_TARGET)
+    xp_target = XP_TARGET_LIST.get("xp_target", DEFAULT_DAILY_XP_TARGET)
     nickname = config.get("nickname", DEFAULT_NICKNAME)
-    display_nickname_toggle = config.bool("display_nickname_toggle", DEFAULT_SHOW_NICKNAME)
     display_extra_stats = config.get("extra_week_stats", DEFAULT_SHOW_EXTRA_STATS)
 
     # if xp_target has no value, set it to zero
-    if xp_target == "":
+    if xp_target == None:
         xp_target = 0
+
+    print("XP Target: " + str(xp_target))
 
     # Trim nickname to only display first five characters
     nickname = nickname[:5].upper()
@@ -453,7 +469,7 @@ def main(config):
 
 
             # Now we subtract the daily XP count from the total count to find out the XP count at the start of the day
-            # (this is saved in the cache so we don't have to continue do the main json query throughout the day - we can calculate the)
+            # (this is saved in the cache so we don't have to perform the main json query more than once per day - we can calculate the)
             # running live total by adding the XP at start of day to the current daily count from the XP Summary query.)
             duolingo_totalxp_daystart = int(duolingo_totalxp) - int(duolingo_xptoday)
 
@@ -542,7 +558,7 @@ def main(config):
             DUOLINGO_ICON = DUOLINGO_ICON_STANDING
 
         # Setup nickname display, if needed
-        if display_nickname_toggle == True:
+        if nickname != "":
             nickname_today_view = render.Row(
                 main_align = "center",
                 cross_align = "right",
@@ -592,8 +608,9 @@ def main(config):
 
 
         # Setup progress bar. Don't display if XP target in Schema is set to 0.
-        if int(xp_target) == 0:
+        if xp_target == "None":
             progressbar = None
+            multiplier_text = None
         else:
             # Setup progress bar dimensions
             progressbar_total_length = 25
@@ -601,9 +618,43 @@ def main(config):
 
             # Calculate progress bar color
             if int(duolingo_xptoday) >= int(xp_target):
-                progressbar_col = "#feeb3a"
+                if int(duolingo_xptoday) >= (11 * int(xp_target)):
+                    progressbar_col = "#d700ff" # purple
+                    high_multiplier = int(duolingo_xptoday) / int(int(xp_target))
+                    multiplier_text = str(int(high_multiplier)) + "x"
+                elif int(duolingo_xptoday) >= (10 * int(xp_target)):
+                    progressbar_col = "#248f47" # dark cyan
+                    multiplier_text = "10x"
+                elif int(duolingo_xptoday) >= (9 * int(xp_target)):
+                    progressbar_col = "#3399cc" # mid blue
+                    multiplier_text = "9x"
+                elif int(duolingo_xptoday) >= (8 * int(xp_target)):
+                    progressbar_col = "#4c0099" # dark purple 
+                    multiplier_text = "8x"
+                elif int(duolingo_xptoday) >= (7 * int(xp_target)):
+                    progressbar_col = "#004d99" # dark blue
+                    multiplier_text = "7x"
+                elif int(duolingo_xptoday) >= (6 * int(xp_target)):
+                    progressbar_col = "#990000" # dark red
+                    multiplier_text = "6x"
+                elif int(duolingo_xptoday) >= (5 * int(xp_target)):
+                    progressbar_col = "#ff00a7" # pink
+                    multiplier_text = "5x"
+                elif int(duolingo_xptoday) >= (4 * int(xp_target)):
+                    progressbar_col = "#ff5800" # burnt orange
+                    multiplier_text = "4x"
+                elif int(duolingo_xptoday) >= (3 * int(xp_target)):
+                    progressbar_col = "#d700ff" # turquoise
+                    multiplier_text = "3x"
+                elif int(duolingo_xptoday) >= (2 * int(xp_target)):
+                    progressbar_col = "#d700ff" # purple
+                    multiplier_text = "2x"
+                else:
+                    progressbar_col = "#ffd700"
+                    multiplier_text = None
             else:
                 progressbar_col = "#666"
+                multiplier_text = None
 
             # Calculate current progress bar length
             #   First, Work out percentage progress to target
@@ -637,6 +688,15 @@ def main(config):
                     
                 ],
             )
+
+
+        # Display multiplier text if needed!
+        if multiplier_text != None:  
+            display_multiplier_spacer = render.Box(width=1, height=1, color="#000000")  
+            display_multiplier_text = render.Text(str(multiplier_text), color = progressbar_col, font = "tom-thumb")
+        else:
+            display_multiplier_spacer = None
+            display_multiplier_text = None
 
         display_output = render.Box(
             render.Row(
@@ -691,7 +751,8 @@ def main(config):
                                 ],
                             ),
                             progressbar,
-                            
+                            display_multiplier_spacer,
+                            display_multiplier_text,
                         ],
                     ),
                 ],
@@ -710,7 +771,7 @@ def main(config):
         print("Display Extra Stats: " + str(display_extra_stats))
 
         if display_extra_stats != "None":
-            vertbar_total_height = 16
+            vertbar_total_height = 17
         else:
             vertbar_total_height = 24
 
@@ -803,7 +864,7 @@ def main(config):
 
             vertbar_thisweek_col_frozen = "#71d2ff"
             vertbar_thisweek_col_missed = "#ff0000"
-            vertbar_thisweek_col_repaired = "#e1e0e0"
+            vertbar_thisweek_col_repaired = "#787878"
 
 
             if display_view == "twoweeks":
@@ -843,9 +904,9 @@ def main(config):
                     vertbar_lastweek_col = "#3a3a3a"
                     vertbar_lastweek_col_header = "#616161"
 
-                vertbar_lastweek_col_frozen = "#76d1fb"
-                vertbar_lastweek_col_missed = "#ff0000"
-                vertbar_lastweek_col_repaired = "#e1e0e0"
+                vertbar_lastweek_col_frozen = "#0093d8"
+                vertbar_lastweek_col_missed = "#b30000"
+                vertbar_lastweek_col_repaired = "#212121"
 
 
             # Calculate this week vertical bar height
@@ -872,6 +933,7 @@ def main(config):
 
             else:
                 vertbar_lastweek_height = 0
+
 
             # Display normal one week proress bar
             oneweek_bar_normal = [
@@ -919,7 +981,7 @@ def main(config):
                     child = render.Padding(
                         child = render.Box(
                             width=5, 
-                            height=vertbar_current_height, 
+                            height=5, 
                             color="#000000",
                             child = render.Text("x", color = "#ff0000",),         
                         ),
@@ -946,7 +1008,7 @@ def main(config):
                     child = render.Padding(
                         child = render.Box(
                             width=5, 
-                            height=vertbar_current_height, 
+                            height=7, 
                             color="#000000",
                             child = render.Image(src = STREAK_ICON_FROZEN),             
                         ),
@@ -974,19 +1036,10 @@ def main(config):
                     child = render.Padding(
                         child = render.Box(
                             width=5, 
-                            height=2, 
-                            color=str(vertbar_col),
-
-                            child = render.Padding(
-                                child = render.Box(
-                                    width=5, 
-                                    height=1, 
-                                    color=str(vertbar_col_header),
-                                ),
-                                pad=(0, 0, 0, vertbar_current_height - 1),                 
-                            ),
+                            height=1, 
+                            color=str(vertbar_thisweek_col_repaired),
                         ),
-                        pad=(0, (vertbar_total_height - vertbar_current_height), 0, 0),                 
+                        pad=(0, (vertbar_total_height - 1), 0, 0),                 
                     ),
                 ),
 
@@ -1079,7 +1132,7 @@ def main(config):
 
                 # Display last week frozen on two week chart
                 twoweeks_bar_lastweek_frozen = render.Box(
-                    width=3, 
+                    width=2, 
                     height=vertbar_total_height, 
                     color="#000000",
                     child = render.Padding(
@@ -1087,6 +1140,70 @@ def main(config):
                             width=2, 
                             height=1, 
                             color=vertbar_lastweek_col_frozen,
+                        ),
+                        pad=(0, (vertbar_total_height - 1), 0, 0),                 
+                    ),
+                )
+
+
+                # Display this week missed on two week chart
+                twoweeks_bar_thisweek_missed = render.Box(
+                    width=3, 
+                    height=vertbar_total_height, 
+                    color="#000000",
+                    child = render.Padding(
+                        child = render.Box(
+                            width=3, 
+                            height=1, 
+                            color=vertbar_thisweek_col_missed,
+                        ),
+                        pad=(0, (vertbar_total_height - 1), 0, 0),                 
+                    ),
+                )
+
+
+                # Display last week missed on two week chart
+                twoweeks_bar_lastweek_missed = render.Box(
+                    width=2, 
+                    height=vertbar_total_height, 
+                    color="#000000",
+                    child = render.Padding(
+                        child = render.Box(
+                            width=2, 
+                            height=1, 
+                            color=vertbar_lastweek_col_missed,
+                        ),
+                        pad=(0, (vertbar_total_height - 1), 0, 0),                 
+                    ),
+                )
+
+
+                # Display this week repaired on two week chart
+                twoweeks_bar_thisweek_repaired = render.Box(
+                    width=3, 
+                    height=vertbar_total_height, 
+                    color="#000000",
+                    child = render.Padding(
+                        child = render.Box(
+                            width=3, 
+                            height=1, 
+                            color=vertbar_thisweek_col_repaired,
+                        ),
+                        pad=(0, (vertbar_total_height - 1), 0, 0),                 
+                    ),
+                )
+
+
+                # Display last week repaired on two week chart
+                twoweeks_bar_lastweek_repaired = render.Box(
+                    width=2, 
+                    height=vertbar_total_height, 
+                    color="#000000",
+                    child = render.Padding(
+                        child = render.Box(
+                            width=2, 
+                            height=1, 
+                            color=vertbar_lastweek_col_repaired,
                         ),
                         pad=(0, (vertbar_total_height - 1), 0, 0),                 
                     ),
@@ -1124,20 +1241,20 @@ def main(config):
                 # last week
                 if display_frozen_lastweek == True:
                     twoweeks_bar_lastweek = twoweeks_bar_lastweek_frozen                        # display the frozen icon
- #               elif display_missed_lastweek == True:
- #                   twoweeks_bar_lastweek = twoweeks_bar_lastweek_missed                        # display the missed day cross icon
- #               elif display_repaired_lastweek == True:
- #                   twoweeks_bar_lastweek = twoweeks_bar_lastweek_repaired                      # display the band aid icon
+                elif display_missed_lastweek == True:
+                    twoweeks_bar_lastweek = twoweeks_bar_lastweek_missed                        # display the missed day cross icon
+                elif display_repaired_lastweek == True:
+                    twoweeks_bar_lastweek = twoweeks_bar_lastweek_repaired                      # display the band aid icon
                 else:
                     twoweeks_bar_lastweek = twoweeks_bar_lastweek_normal            # display the normal progress indicator
 
                 # this week
                 if display_frozen_thisweek == True:
                     twoweeks_bar_thisweek = twoweeks_bar_thisweek_frozen                        # display the frozen icon
- #               elif display_missed_thisweek == True:
- #                   twoweeks_bar_thisweek = twoweeks_bar_thisweek_missed                        # display the missed day cross icon
- #               elif display_repaired_thisweek == True:
- #                   twoweeks_bar_thisweek = twoweeks_bar_thisweek_repaired                      # display the band aid icon
+                elif display_missed_thisweek == True:
+                    twoweeks_bar_thisweek = twoweeks_bar_thisweek_missed                        # display the missed day cross icon
+                elif display_repaired_thisweek == True:
+                    twoweeks_bar_thisweek = twoweeks_bar_thisweek_repaired                      # display the band aid icon
                 else:
                     twoweeks_bar_thisweek = twoweeks_bar_thisweek_normal                # display the normal progress indicator
 
