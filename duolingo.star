@@ -28,7 +28,7 @@ DEFAULT_TIMEZONE = "Europe/London"    # Affects when the daily XP counter resets
 DEFAULT_DISPLAY_VIEW = "today"        # can be 'today', 'week' or 'twoweeks'
 DEFAULT_NICKNAME = "Olly"             # Max five characters. Displays on screen to identify the Duolingo user.
 DEFAULT_SHOW_NICKNAME = False         # Choose whther to display the nickname on screen.
-DEFAULT_SHOW_EXTRA_STATS = True       # Display currennt Streak and total XP score on the week chart.
+DEFAULT_SHOW_EXTRA_STATS = "totalxp"       # Display currennt Streak and total XP score on the week chart. Can be 'none', 'chartxp' or 'totalxp'
 
 
 # 16 x 18
@@ -102,11 +102,22 @@ DISPLAY_VIEW_LIST = {
     "Two Weeks": "twoweeks",
 }
 
+DISPLAY_HEADER_LIST = {
+    "None": "none",
+    "Streak + Chart XP": "chartxp",
+    "Streak + Total XP": "totalxp",
+}
+
 def get_schema():
 
     displayoptions = [
         schema.Option(display = displayv, value = displayv)
         for displayv in DISPLAY_VIEW_LIST
+    ]
+
+    headeroptions = [
+        schema.Option(display = headerd, value = headerd)
+        for headerd in DISPLAY_HEADER_LIST
     ]
 
     return schema.Schema(
@@ -148,12 +159,13 @@ def get_schema():
             icon = "toggle-on",
             default = DEFAULT_SHOW_NICKNAME,
         ),
-        schema.Toggle(
+        schema.Dropdown(
             id = "extra_week_stats",
             name = "Extra Chart Stats?",
-            desc = "Toggle to display the current Streak and total XP for the one/two weeks.",
-            icon = "toggle-on",
-            default = DEFAULT_SHOW_EXTRA_STATS,
+            desc = "Optionally display the user's Streak and Total XP, or the XP for the current chart duration.",
+            icon = "rectangle-wide",
+            default = headeroptions[0].value,
+            options = headeroptions,
         ),
     ],
 )
@@ -166,7 +178,7 @@ def main(config):
     xp_target = config.get("xp_target", DEFAULT_DAILY_XP_TARGET)
     nickname = config.get("nickname", DEFAULT_NICKNAME)
     display_nickname_toggle = config.bool("display_nickname_toggle", DEFAULT_SHOW_NICKNAME)
-    display_extra_stats = config.bool("extra_week_stats", DEFAULT_SHOW_EXTRA_STATS)
+    display_extra_stats = config.get("extra_week_stats", DEFAULT_SHOW_EXTRA_STATS)
 
     # if xp_target has no value, set it to zero
     if xp_target == "":
@@ -697,7 +709,7 @@ def main(config):
 
         print("Display Extra Stats: " + str(display_extra_stats))
 
-        if display_extra_stats == True:
+        if display_extra_stats != "None":
             vertbar_total_height = 16
         else:
             vertbar_total_height = 24
@@ -1241,7 +1253,13 @@ def main(config):
             week_progress_chart.append(day_progress_chart)
 
 
-        if display_extra_stats == True:
+        if display_extra_stats != "None" :
+
+            # Choose which XP count to display
+            if display_extra_stats == "Streak + Chart XP":
+                xp_score = str(week_xp_scores_total)
+            if display_extra_stats == "Streak + Total XP":
+                xp_score = str(duolingo_totalxp_now)
 
             display_stats_header = render.Row(
                 expanded = True,
@@ -1284,7 +1302,7 @@ def main(config):
                                 expanded = False,
                                 children = [
                                     render.Image(src = XP_ICON),
-                                    render.Text(str(week_xp_scores_total), font = "tom-thumb"),
+                                    render.Text(str(xp_score), font = "tom-thumb"),
                                 ],
                             ),
                         ],
