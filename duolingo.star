@@ -685,7 +685,7 @@ def main(config):
                     progressbar_col = "#ffd700"
                     multiplier_text = None
             else:
-                progressbar_col = "#666"
+                progressbar_col = "#666666"
                 multiplier_text = None
 
             # Calculate current progress bar length
@@ -697,75 +697,98 @@ def main(config):
 
             if progressbar_current_length < progressbar_total_length:
 
-                progressbar_frame1 = render.Row(
-                    main_align = "space_evenly",
-                    cross_align = "center", # Controls vertical alignment
-                    expanded = False,
-                    children = [
-                        render.Box(
-                            width=(progressbar_total_length + 2), 
-                            height=(progressbar_total_height + 2), 
-                            color="#e1e0e0",
-                            child = render.Box(
-                                width=progressbar_total_length, 
-                                height=progressbar_total_height, 
-                                color="#000000",
-                                child = render.Padding(
-                                    child = render.Box(
-                                        width=progressbar_current_length, 
-                                        height=3, 
-                                        color=progressbar_col,
-                                    ),
-                                    pad=(0, 0, (progressbar_total_length - progressbar_current_length), 0),                 
-                                ),
-                            ),
-                        ),
-                        
-                    ],
-                )
+                fadeList = [] # This sets up the fading progress indicator
 
-                progressbar_frame2 = render.Row(
-                    main_align = "space_evenly",
-                    cross_align = "center", # Controls vertical alignment
-                    expanded = False,
-                    children = [
-                        render.Box(
-                            width=(progressbar_total_length + 2), 
-                            height=(progressbar_total_height + 2), 
-                            color="#e1e0e0",
-                            child = render.Box(
-                                width=progressbar_total_length, 
-                                height=progressbar_total_height, 
-                                color="#000000",
-                                child = render.Padding(
-                                    child = render.Box(
-                                        width=progressbar_current_length + 2, 
-                                        height=3, 
-                                        color=progressbar_col,
+                for frame in range(35):
+
+                    #Setup fader colors - transitions from black to grey
+                    if frame == 0 or frame == 1:
+                        fading_indicator_col = "#000000" # Black
+                    elif frame == 2 or frame == 3:
+                        fading_indicator_col = "#0d0d0d" # Step 7
+                    elif frame == 4 or frame == 5:
+                        fading_indicator_col = "#1a1a1a" # Step 6
+                    elif frame == 6 or frame == 7:
+                        fading_indicator_col = "#272727" # Step 5
+                    elif frame == 8 or frame == 9:
+                        fading_indicator_col = "#333333" # Step 4
+                    elif frame == 10 or frame == 11:
+                        fading_indicator_col = "#404040" # Step 3
+                    elif frame == 12 or frame == 13:
+                        fading_indicator_col = "#4c4c4c" # Step 2
+                    elif frame == 14 or frame == 15:
+                        fading_indicator_col = "#595959" # Step 1
+                    elif frame >= 16 and frame <= 19:
+                        fading_indicator_col = "#666666" # Progress Bar Grey
+                    elif frame == 20 or frame == 21:
+                        fading_indicator_col = "#595959" # Step 1
+                    elif frame == 22 or frame == 23:
+                        fading_indicator_col = "#4c4c4c" # Step 2
+                    elif frame == 24 or frame == 25:
+                        fading_indicator_col = "#404040" # Step 3
+                    elif frame == 26 or frame == 27:
+                        fading_indicator_col = "#333333" # Step 4
+                    elif frame == 28 or frame == 29:
+                        fading_indicator_col = "#272727" # Step 5
+                    elif frame == 30 or frame == 31:
+                        fading_indicator_col = "#1a1a1a" # Step 6
+                    elif frame == 32 or frame == 33:
+                        fading_indicator_col = "#0d0d0d" # Step 7
+                    else:
+                        fading_indicator_col = "#000000" # Black
+
+                    if progressbar_current_length > 0:
+                        display_progressbar_length = render.Box(
+                            width=progressbar_current_length, 
+                            height=3, 
+                            color=progressbar_col,
+                        )
+                    else:
+                        display_progressbar_length = None
+
+                    # Setup fading indeicator for progress bar
+                    progressbar_frame = render.Row(
+                        main_align = "start",
+                        cross_align = "center", # Controls vertical alignment
+                        expanded = False,
+                        children = [
+                            render.Box(
+                                width=(progressbar_total_length + 2), 
+                                height=(progressbar_total_height + 2), 
+                                color="#e1e0e0",
+                                child = render.Box(
+                                    width=progressbar_total_length, 
+                                    height=progressbar_total_height, 
+                                    color="#000000",
+                                    child = render.Padding(
+                                        child = render.Row(
+                                            main_align = "start",
+                                            cross_align = "start", # Controls vertical alignment
+                                            expanded = True,
+                                            children = [
+                                                display_progressbar_length,
+                                                render.Box(
+                                                    width=1, 
+                                                    height=3, 
+                                                    color=fading_indicator_col,
+                                                ),
+                                            ],
+                                        ),
+                                        pad=(0, 0, (progressbar_total_length - 1 - progressbar_current_length), 0),                 
                                     ),
-                                    pad=(0, 0, (progressbar_total_length - progressbar_current_length), 0),                 
+
                                 ),
+
                             ),
-                        ),
-                        
-                    ],
-                )
+                        ],
+                    )
+
+                    fadeList.append(progressbar_frame)
 
                 progressbar = render.Animation(
-                     children=[
-                          progressbar_frame1,
-                          progressbar_frame1,
-                          progressbar_frame1,
-                          progressbar_frame1,
-                          progressbar_frame1,
-                          progressbar_frame1,
-                          progressbar_frame2,
-                          progressbar_frame2,
-                          progressbar_frame2,
-                          progressbar_frame2,
-                          progressbar_frame2,
-                          progressbar_frame2,
-                     ],
+                     children=(
+                          fadeList
+                     ),
                 )
 
 
